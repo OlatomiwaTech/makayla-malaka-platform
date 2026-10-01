@@ -20,8 +20,8 @@ export type RegisterInput = {
   email: string;
   username: string;
   password: string;
-  displayName?: string;
-  bio?: string;
+  displayName?: string | undefined;
+  bio?: string | undefined;
 };
 
 export type LoginInput = {
