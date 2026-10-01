@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Bell, Search } from 'lucide-react';
 
@@ -15,9 +16,17 @@ export function Header() {
 			<div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 lg:px-8">
 				<Link
 					href="/"
-					className="text-[20px] font-semibold tracking-[-0.04em]"
+					className="flex items-center gap-3 text-[20px] font-semibold tracking-[-0.04em]"
 				>
-					Makayla
+					<Image
+						src="/Logo.png"
+						alt=""
+						width={36}
+						height={36}
+						priority
+						className="size-9 object-contain"
+					/>
+					<span>Makayla</span>
 				</Link>
 
 				<nav className="hidden items-center gap-8 md:flex">

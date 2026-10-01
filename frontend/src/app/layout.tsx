@@ -8,6 +8,10 @@ export const metadata: Metadata = {
   title: 'Makayla Malaka',
   description:
     'The official digital home for Makayla Malaka.',
+  icons: {
+    icon: '/Logo.png',
+    apple: '/Logo.png',
+  },
 };
 
 export default function RootLayout({
