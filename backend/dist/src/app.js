@@ -74,6 +74,18 @@ const errorHandler = (err, _req, res, _next) => {
         });
         return;
     }
+    if (err instanceof Error &&
+        [
+            'Invalid YouTube video URL',
+            'This YouTube video has already been added',
+            'Video not found',
+        ].includes(err.message)) {
+        res.status(400).json({
+            success: false,
+            message: err.message,
+        });
+        return;
+    }
     res.status(500).json({
         success: false,
         message: 'Internal server error',
