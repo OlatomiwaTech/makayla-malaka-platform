@@ -26,6 +26,12 @@ enum PostStatus {
   ARCHIVED
 }
 
+enum ReleaseType {
+  SINGLE
+  EP
+  ALBUM
+}
+
 enum ReleaseStatus {
   DRAFT
   PUBLISHED
@@ -190,7 +196,9 @@ model MusicRelease {
   description String?
   coverUrl    String?
   releaseDate DateTime
+  type        ReleaseType
   status      ReleaseStatus @default(DRAFT)
+  isFeatured  Boolean       @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -199,6 +207,7 @@ model MusicRelease {
   links  MusicPlatformLink[]
 
   @@index([status, releaseDate])
+  @@index([isFeatured, status])
 }
 
 model Track {
@@ -207,10 +216,12 @@ model Track {
   title     String
   trackNumber Int
   durationSeconds Int?
+  previewUrl String?
 
   release MusicRelease @relation(fields: [releaseId], references: [id], onDelete: Cascade)
 
   @@unique([releaseId, trackNumber])
+  @@index([releaseId])
 }
 
 model MusicPlatformLink {
@@ -222,6 +233,7 @@ model MusicPlatformLink {
   release MusicRelease @relation(fields: [releaseId], references: [id], onDelete: Cascade)
 
   @@unique([releaseId, platform])
+  @@index([releaseId])
 }
 
 model Video {
