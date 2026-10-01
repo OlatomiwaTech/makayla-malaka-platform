@@ -21,6 +21,4 @@ export const updateProfileSchema = z.object({
     .optional(),
 });
 
-export type UpdateProfileInput = z.infer<
-  typeof updateProfileSchema
->;
+export default updateProfileSchema;
