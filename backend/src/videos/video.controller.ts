@@ -17,6 +17,8 @@ export const create = async (
   req: Request,
   res: Response,
 ) => {
+  console.log('VIDEO REQUEST BODY:', req.body);
+
   const input = createVideoSchema.parse(req.body);
 
   const video = await createVideo(input);

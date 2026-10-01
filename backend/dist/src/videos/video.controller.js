@@ -1,6 +1,7 @@
 import { createVideo, getPublishedVideoById, getPublishedVideos, updateVideo, } from './video.service.js';
 import { createVideoSchema, updateVideoSchema, videoListQuerySchema, } from '../schemas/video.schema.js';
 export const create = async (req, res) => {
+    console.log('VIDEO REQUEST BODY:', req.body);
     const input = createVideoSchema.parse(req.body);
     const video = await createVideo(input);
     res.status(201).json({
