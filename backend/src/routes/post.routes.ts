@@ -7,8 +7,8 @@ import {
   update,
 } from '../posts/post.controller.js';
 
-import { authenticate } from '../middleware/auth.middleware.js';
-import { requireRoles } from '../middleware/role.middleware.js';
+import { requireAuth } from '../middleware/auth.middleware.js';
+import { requireRole } from '../middleware/role.middleware.js';
 import { asyncHandler } from '../middleware/async-handler.js';
 
 const router = Router();
@@ -25,15 +25,15 @@ router.get(
 
 router.post(
   '/',
-  authenticate,
-  requireRoles('EDITOR', 'ADMIN'),
+  requireAuth,
+  requireRole('EDITOR', 'ADMIN'),
   asyncHandler(create),
 );
 
 router.patch(
   '/:id',
-  authenticate,
-  requireRoles('EDITOR', 'ADMIN'),
+  requireAuth,
+  requireRole('EDITOR', 'ADMIN'),
   asyncHandler(update),
 );
 

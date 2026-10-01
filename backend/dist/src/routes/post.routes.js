@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { create, getOne, list, remove, update, } from '../posts/post.controller.js';
+import { create, getOne, list, update, } from '../posts/post.controller.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
+import { requireRole } from '../middleware/role.middleware.js';
+import { asyncHandler } from '../middleware/async-handler.js';
 const router = Router();
-router.get('/', list);
-router.get('/:id', getOne);
-router.post('/', requireAuth, create);
-router.patch('/:id', requireAuth, update);
-router.delete('/:id', requireAuth, remove);
+router.get('/', asyncHandler(list));
+router.get('/:id', asyncHandler(getOne));
+router.post('/', requireAuth, requireRole('EDITOR', 'ADMIN'), asyncHandler(create));
+router.patch('/:id', requireAuth, requireRole('EDITOR', 'ADMIN'), asyncHandler(update));
 export default router;
 //# sourceMappingURL=post.routes.js.map
