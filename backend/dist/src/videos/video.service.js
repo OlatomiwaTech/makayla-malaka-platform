@@ -1,16 +1,25 @@
 import { prisma } from '../lib/prisma.js';
+import { extractYouTubeVideoId, getYouTubeEmbedUrl, getYouTubeThumbnailUrl, } from '../lib/youtube.js';
+const requireYouTubeVideoId = (youtubeUrl) => {
+    const videoId = extractYouTubeVideoId(youtubeUrl);
+    if (!videoId) {
+        throw new Error('Enter a valid YouTube URL');
+    }
+    return videoId;
+};
 export const createVideo = async (input) => {
+    const youtubeVideoId = requireYouTubeVideoId(input.youtubeUrl);
     return prisma.video.create({
         data: {
-            youtubeVideoId: input.youtubeVideoId,
+            youtubeVideoId,
             title: input.title,
             ...(input.description !== undefined
                 ? { description: input.description }
                 : {}),
             ...(input.thumbnailUrl !== undefined
                 ? { thumbnailUrl: input.thumbnailUrl }
-                : {}),
-            videoUrl: input.videoUrl,
+                : { thumbnailUrl: getYouTubeThumbnailUrl(youtubeVideoId) }),
+            videoUrl: getYouTubeEmbedUrl(youtubeVideoId),
             category: input.category,
             status: input.status,
             publishedAt: input.status === 'PUBLISHED'
@@ -34,11 +43,22 @@ export const updateVideo = async (videoId, input) => {
     if (input.status === 'DRAFT') {
         publishedAt = null;
     }
+    const youtubeVideoId = input.youtubeUrl !== undefined
+        ? requireYouTubeVideoId(input.youtubeUrl)
+        : undefined;
+    const thumbnailUrl = input.thumbnailUrl !== undefined
+        ? input.thumbnailUrl
+        : youtubeVideoId !== undefined
+            ? getYouTubeThumbnailUrl(youtubeVideoId)
+            : undefined;
     return prisma.video.update({
         where: { id: videoId },
         data: {
-            ...(input.youtubeVideoId !== undefined
-                ? { youtubeVideoId: input.youtubeVideoId }
+            ...(youtubeVideoId !== undefined
+                ? {
+                    youtubeVideoId,
+                    videoUrl: getYouTubeEmbedUrl(youtubeVideoId),
+                }
                 : {}),
             ...(input.title !== undefined
                 ? { title: input.title }
@@ -48,10 +68,9 @@ export const updateVideo = async (videoId, input) => {
                 : {}),
             ...(input.thumbnailUrl !== undefined
                 ? { thumbnailUrl: input.thumbnailUrl }
-                : {}),
-            ...(input.videoUrl !== undefined
-                ? { videoUrl: input.videoUrl }
-                : {}),
+                : thumbnailUrl !== undefined
+                    ? { thumbnailUrl }
+                    : {}),
             ...(input.category !== undefined
                 ? { category: input.category }
                 : {}),

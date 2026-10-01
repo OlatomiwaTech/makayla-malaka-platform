@@ -1,11 +1,18 @@
 import { z } from 'zod';
 
+import { extractYouTubeVideoId } from '../lib/youtube.js';
+
+const youtubeUrlSchema = z
+  .string()
+  .trim()
+  .url('Enter a valid YouTube URL')
+  .refine(
+    (value) => extractYouTubeVideoId(value) !== null,
+    'Enter a valid YouTube URL',
+  );
+
 export const createVideoSchema = z.object({
-  youtubeVideoId: z
-    .string()
-    .trim()
-    .min(1)
-    .max(20),
+  youtubeUrl: youtubeUrlSchema,
 
   title: z
     .string()
@@ -21,12 +28,9 @@ export const createVideoSchema = z.object({
 
   thumbnailUrl: z
     .string()
+    .trim()
     .url()
     .optional(),
-
-  videoUrl: z
-    .string()
-    .url(),
 
   category: z
     .string()
@@ -35,12 +39,51 @@ export const createVideoSchema = z.object({
     .max(50),
 
   status: z
-    .enum(['DRAFT', 'PUBLISHED', 'ARCHIVED'])
+    .enum([
+      'DRAFT',
+      'PUBLISHED',
+      'ARCHIVED',
+    ])
     .default('DRAFT'),
 });
 
-export const updateVideoSchema =
-  createVideoSchema.partial();
+export const updateVideoSchema = z.object({
+  youtubeUrl: youtubeUrlSchema.optional(),
+
+  title: z
+    .string()
+    .trim()
+    .min(1)
+    .max(150)
+    .optional(),
+
+  description: z
+    .string()
+    .trim()
+    .max(5000)
+    .optional(),
+
+  category: z
+    .string()
+    .trim()
+    .min(1)
+    .max(50)
+    .optional(),
+
+  thumbnailUrl: z
+    .string()
+    .trim()
+    .url()
+    .optional(),
+
+  status: z
+    .enum([
+      'DRAFT',
+      'PUBLISHED',
+      'ARCHIVED',
+    ])
+    .optional(),
+});
 
 export const videoListQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),

@@ -4,21 +4,38 @@ import type {
   CreateVideoInput,
   UpdateVideoInput,
 } from '../schemas/video.schema.js';
+import {
+  extractYouTubeVideoId,
+  getYouTubeEmbedUrl,
+  getYouTubeThumbnailUrl,
+} from '../lib/youtube.js';
+
+const requireYouTubeVideoId = (youtubeUrl: string) => {
+  const videoId = extractYouTubeVideoId(youtubeUrl);
+
+  if (!videoId) {
+    throw new Error('Enter a valid YouTube URL');
+  }
+
+  return videoId;
+};
 
 export const createVideo = async (
   input: CreateVideoInput,
 ) => {
+  const youtubeVideoId = requireYouTubeVideoId(input.youtubeUrl);
+
   return prisma.video.create({
     data: {
-      youtubeVideoId: input.youtubeVideoId,
+      youtubeVideoId,
       title: input.title,
       ...(input.description !== undefined
         ? { description: input.description }
         : {}),
       ...(input.thumbnailUrl !== undefined
         ? { thumbnailUrl: input.thumbnailUrl }
-        : {}),
-      videoUrl: input.videoUrl,
+        : { thumbnailUrl: getYouTubeThumbnailUrl(youtubeVideoId) }),
+      videoUrl: getYouTubeEmbedUrl(youtubeVideoId),
       category: input.category,
       status: input.status,
       publishedAt:
@@ -54,11 +71,23 @@ export const updateVideo = async (
     publishedAt = null;
   }
 
+  const youtubeVideoId = input.youtubeUrl !== undefined
+    ? requireYouTubeVideoId(input.youtubeUrl)
+    : undefined;
+  const thumbnailUrl = input.thumbnailUrl !== undefined
+    ? input.thumbnailUrl
+    : youtubeVideoId !== undefined
+      ? getYouTubeThumbnailUrl(youtubeVideoId)
+      : undefined;
+
   return prisma.video.update({
     where: { id: videoId },
     data: {
-      ...(input.youtubeVideoId !== undefined
-        ? { youtubeVideoId: input.youtubeVideoId }
+      ...(youtubeVideoId !== undefined
+        ? {
+            youtubeVideoId,
+            videoUrl: getYouTubeEmbedUrl(youtubeVideoId),
+          }
         : {}),
       ...(input.title !== undefined
         ? { title: input.title }
@@ -68,9 +97,8 @@ export const updateVideo = async (
         : {}),
       ...(input.thumbnailUrl !== undefined
         ? { thumbnailUrl: input.thumbnailUrl }
-        : {}),
-      ...(input.videoUrl !== undefined
-        ? { videoUrl: input.videoUrl }
+        : thumbnailUrl !== undefined
+          ? { thumbnailUrl }
         : {}),
       ...(input.category !== undefined
         ? { category: input.category }
