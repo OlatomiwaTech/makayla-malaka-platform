@@ -1,8 +1,9 @@
-import 'dotenv/config';
+import './config/env.js';
 
 import app from './app.js';
+import { env } from './config/env.js';
 
-const PORT = Number(process.env.PORT) || 5000;
+const PORT = env.PORT;
 
 const server = app.listen(PORT, () => {
   console.log(`Makayla Platform API running on port ${PORT}`);
