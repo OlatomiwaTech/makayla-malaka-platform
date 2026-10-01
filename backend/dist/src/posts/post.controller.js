@@ -1,9 +1,17 @@
-import { createPost, deletePost, getPostById, getPosts, updatePost } from './post.service.js';
-import { createPostSchema, updatePostSchema } from '../schemas/post.schema.js';
+import { createPost, deletePost, getPublishedPostById, getPublishedPosts, updatePost, } from './post.service.js';
+import { createPostSchema, postListQuerySchema, updatePostSchema, } from '../schemas/post.schema.js';
 export const getAllPosts = async (_req, res, next) => {
     try {
-        const posts = await getPosts();
-        return res.status(200).json({ success: true, posts });
+        const parsed = postListQuerySchema.safeParse(_req.query);
+        if (!parsed.success) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid pagination parameters.',
+                errors: parsed.error.flatten().fieldErrors,
+            });
+        }
+        const result = await getPublishedPosts(parsed.data.page, parsed.data.limit);
+        return res.status(200).json({ success: true, ...result });
     }
     catch (error) {
         return next(error);
@@ -18,7 +26,7 @@ export const getSinglePost = async (req, res, next) => {
                 message: 'Post id is required.',
             });
         }
-        const post = await getPostById(id);
+        const post = await getPublishedPostById(id);
         return res.status(200).json({ success: true, post });
     }
     catch (error) {

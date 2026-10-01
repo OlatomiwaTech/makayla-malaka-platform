@@ -17,9 +17,13 @@ export const createPost = async (
   return prisma.post.create({
     data: {
       authorId,
-      title: input.title,
+      ...(input.title !== undefined
+        ? { title: input.title }
+        : {}),
       content: input.content,
-      imageUrl: input.imageUrl,
+      ...(input.imageUrl !== undefined
+        ? { imageUrl: input.imageUrl }
+        : {}),
       status: input.status,
       publishedAt,
     },
@@ -41,6 +45,7 @@ export const createPost = async (
 
 export const updatePost = async (
   postId: string,
+  authorId: string,
   input: UpdatePostInput,
 ) => {
   const existingPost = await prisma.post.findUnique({
@@ -51,6 +56,10 @@ export const updatePost = async (
 
   if (!existingPost) {
     throw new Error('Post not found');
+  }
+
+  if (existingPost.authorId !== authorId) {
+    throw new Error('You are not allowed to update this post');
   }
 
   let publishedAt = existingPost.publishedAt;
@@ -101,6 +110,31 @@ export const updatePost = async (
           },
         },
       },
+    },
+  });
+};
+
+export const deletePost = async (
+  postId: string,
+  authorId: string,
+) => {
+  const existingPost = await prisma.post.findUnique({
+    where: {
+      id: postId,
+    },
+  });
+
+  if (!existingPost) {
+    throw new Error('Post not found');
+  }
+
+  if (existingPost.authorId !== authorId) {
+    throw new Error('You are not allowed to delete this post');
+  }
+
+  return prisma.post.delete({
+    where: {
+      id: postId,
     },
   });
 };

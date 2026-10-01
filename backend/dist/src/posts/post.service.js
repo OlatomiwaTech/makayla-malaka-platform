@@ -1,79 +1,24 @@
 import { prisma } from '../lib/prisma.js';
-export const getPosts = async () => {
-    return prisma.post.findMany({
-        where: { status: 'PUBLISHED' },
-        orderBy: { createdAt: 'desc' },
-        include: {
-            author: {
-                select: {
-                    id: true,
-                    username: true,
-                    profile: {
-                        select: {
-                            displayName: true,
-                            avatarUrl: true,
-                        },
-                    },
-                },
-            },
-            comments: true,
-            likes: true,
-        },
-    });
-};
-export const getPostById = async (id) => {
-    const post = await prisma.post.findUnique({
-        where: { id },
-        include: {
-            author: {
-                select: {
-                    id: true,
-                    username: true,
-                    profile: {
-                        select: {
-                            displayName: true,
-                            avatarUrl: true,
-                        },
-                    },
-                },
-            },
-            comments: {
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            username: true,
-                            profile: {
-                                select: {
-                                    displayName: true,
-                                    avatarUrl: true,
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-            likes: true,
-        },
-    });
-    if (!post) {
-        throw new Error('Post not found');
-    }
-    return post;
-};
 export const createPost = async (authorId, input) => {
+    const publishedAt = input.status === 'PUBLISHED'
+        ? new Date()
+        : null;
     return prisma.post.create({
         data: {
             authorId,
-            title: input.title ?? null,
+            ...(input.title !== undefined
+                ? { title: input.title }
+                : {}),
             content: input.content,
-            imageUrl: input.imageUrl ?? null,
-            status: input.status ?? 'DRAFT',
+            ...(input.imageUrl !== undefined
+                ? { imageUrl: input.imageUrl }
+                : {}),
+            status: input.status,
+            publishedAt,
         },
         include: {
             author: {
                 select: {
-                    id: true,
                     username: true,
                     profile: {
                         select: {
@@ -87,38 +32,152 @@ export const createPost = async (authorId, input) => {
     });
 };
 export const updatePost = async (postId, authorId, input) => {
-    const post = await prisma.post.findUnique({
-        where: { id: postId },
+    const existingPost = await prisma.post.findUnique({
+        where: {
+            id: postId,
+        },
     });
-    if (!post) {
+    if (!existingPost) {
         throw new Error('Post not found');
     }
-    if (post.authorId !== authorId) {
+    if (existingPost.authorId !== authorId) {
         throw new Error('You are not allowed to update this post');
     }
+    let publishedAt = existingPost.publishedAt;
+    if (input.status === 'PUBLISHED' &&
+        existingPost.status !== 'PUBLISHED') {
+        publishedAt = new Date();
+    }
+    if (input.status === 'DRAFT') {
+        publishedAt = null;
+    }
     return prisma.post.update({
-        where: { id: postId },
+        where: {
+            id: postId,
+        },
         data: {
-            ...(input.title !== undefined ? { title: input.title } : {}),
-            ...(input.content !== undefined ? { content: input.content } : {}),
-            ...(input.imageUrl !== undefined ? { imageUrl: input.imageUrl } : {}),
-            ...(input.status !== undefined ? { status: input.status } : {}),
+            ...(input.title !== undefined
+                ? { title: input.title }
+                : {}),
+            ...(input.content !== undefined
+                ? { content: input.content }
+                : {}),
+            ...(input.imageUrl !== undefined
+                ? { imageUrl: input.imageUrl }
+                : {}),
+            ...(input.status !== undefined
+                ? { status: input.status }
+                : {}),
+            publishedAt,
+        },
+        include: {
+            author: {
+                select: {
+                    username: true,
+                    profile: {
+                        select: {
+                            displayName: true,
+                            avatarUrl: true,
+                        },
+                    },
+                },
+            },
         },
     });
 };
 export const deletePost = async (postId, authorId) => {
-    const post = await prisma.post.findUnique({
-        where: { id: postId },
+    const existingPost = await prisma.post.findUnique({
+        where: {
+            id: postId,
+        },
+    });
+    if (!existingPost) {
+        throw new Error('Post not found');
+    }
+    if (existingPost.authorId !== authorId) {
+        throw new Error('You are not allowed to delete this post');
+    }
+    return prisma.post.delete({
+        where: {
+            id: postId,
+        },
+    });
+};
+export const getPublishedPosts = async (page, limit) => {
+    const skip = (page - 1) * limit;
+    const [posts, total] = await prisma.$transaction([
+        prisma.post.findMany({
+            where: {
+                status: 'PUBLISHED',
+                publishedAt: {
+                    not: null,
+                },
+            },
+            orderBy: {
+                publishedAt: 'desc',
+            },
+            skip,
+            take: limit,
+            include: {
+                author: {
+                    select: {
+                        username: true,
+                        profile: {
+                            select: {
+                                displayName: true,
+                                avatarUrl: true,
+                            },
+                        },
+                    },
+                },
+            },
+        }),
+        prisma.post.count({
+            where: {
+                status: 'PUBLISHED',
+                publishedAt: {
+                    not: null,
+                },
+            },
+        }),
+    ]);
+    return {
+        posts,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+            hasNextPage: page * limit < total,
+        },
+    };
+};
+export const getPublishedPostById = async (postId) => {
+    const post = await prisma.post.findFirst({
+        where: {
+            id: postId,
+            status: 'PUBLISHED',
+            publishedAt: {
+                not: null,
+            },
+        },
+        include: {
+            author: {
+                select: {
+                    username: true,
+                    profile: {
+                        select: {
+                            displayName: true,
+                            avatarUrl: true,
+                        },
+                    },
+                },
+            },
+        },
     });
     if (!post) {
         throw new Error('Post not found');
     }
-    if (post.authorId !== authorId) {
-        throw new Error('You are not allowed to delete this post');
-    }
-    await prisma.post.delete({
-        where: { id: postId },
-    });
-    return { success: true };
+    return post;
 };
 //# sourceMappingURL=post.service.js.map
