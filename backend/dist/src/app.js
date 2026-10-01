@@ -48,7 +48,11 @@ const errorHandler = (err, _req, res, _next) => {
         res.status(400).json({
             success: false,
             message: 'Validation failed',
-            errors: err.flatten().fieldErrors,
+            errors: err.issues.map((issue) => ({
+                field: issue.path.join('.'),
+                message: issue.message,
+                code: issue.code,
+            })),
         });
         return;
     }
