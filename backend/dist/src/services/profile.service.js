@@ -1,8 +1,6 @@
 import { prisma } from '../lib/prisma.js';
 
-import type { UpdateProfileInput } from '../schemas/profile.schema.js';
-
-export const getMyProfile = async (userId: string) => {
+export const getMyProfile = async (userId) => {
   const user = await prisma.user.findUnique({
     where: {
       id: userId,
@@ -33,10 +31,7 @@ export const getMyProfile = async (userId: string) => {
   return user;
 };
 
-export const updateMyProfile = async (
-  userId: string,
-  input: UpdateProfileInput,
-) => {
+export const updateMyProfile = async (userId, input) => {
   const profile = await prisma.profile.findUnique({
     where: {
       userId,
@@ -55,24 +50,16 @@ export const updateMyProfile = async (
       userId,
     },
     data: {
-      ...(input.displayName !== undefined
-        ? { displayName: input.displayName }
-        : {}),
-      ...(input.bio !== undefined
-        ? { bio: input.bio }
-        : {}),
-      ...(input.avatarUrl !== undefined
-        ? { avatarUrl: input.avatarUrl }
-        : {}),
+      ...(input.displayName !== undefined ? { displayName: input.displayName } : {}),
+      ...(input.bio !== undefined ? { bio: input.bio } : {}),
+      ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
     },
   });
 
   return updatedProfile;
 };
 
-export const getPublicProfile = async (
-  username: string,
-) => {
+export const getPublicProfile = async (username) => {
   const user = await prisma.user.findUnique({
     where: {
       username: username.toLowerCase(),
