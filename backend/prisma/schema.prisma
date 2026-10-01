@@ -338,3 +338,8 @@ model RefreshToken {
   @@index([userId])
   @@index([expiresAt])
 }
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
