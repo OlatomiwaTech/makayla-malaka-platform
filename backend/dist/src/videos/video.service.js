@@ -2,6 +2,7 @@ import { prisma } from '../lib/prisma.js';
 export const createVideo = async (input) => {
     return prisma.video.create({
         data: {
+            youtubeVideoId: input.youtubeVideoId,
             title: input.title,
             ...(input.description !== undefined
                 ? { description: input.description }
@@ -36,6 +37,9 @@ export const updateVideo = async (videoId, input) => {
     return prisma.video.update({
         where: { id: videoId },
         data: {
+            ...(input.youtubeVideoId !== undefined
+                ? { youtubeVideoId: input.youtubeVideoId }
+                : {}),
             ...(input.title !== undefined
                 ? { title: input.title }
                 : {}),

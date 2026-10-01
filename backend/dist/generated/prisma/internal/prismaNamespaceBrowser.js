@@ -150,6 +150,7 @@ export const MusicPlatformLinkScalarFieldEnum = {
 };
 export const VideoScalarFieldEnum = {
     id: 'id',
+    youtubeVideoId: 'youtubeVideoId',
     title: 'title',
     description: 'description',
     thumbnailUrl: 'thumbnailUrl',
