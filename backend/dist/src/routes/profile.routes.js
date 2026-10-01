@@ -41,7 +41,13 @@ router.patch('/me', requireAuth, asyncHandler(async (req, res) => {
     });
 }));
 router.get('/:username', asyncHandler(async (req, res) => {
-    const { username } = req.params;
+    const username = req.params.username;
+    if (!username || Array.isArray(username)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Username is required.',
+        });
+    }
     const profile = await getPublicProfile(username);
     return res.status(200).json({
         success: true,

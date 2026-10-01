@@ -1,86 +1,67 @@
 import { prisma } from '../lib/prisma.js';
-
 export const getMyProfile = async (userId) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      email: true,
-      username: true,
-      role: true,
-      status: true,
-      createdAt: true,
-      profile: {
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
         select: {
-          displayName: true,
-          bio: true,
-          avatarUrl: true,
-          createdAt: true,
-          updatedAt: true,
+            id: true,
+            email: true,
+            username: true,
+            role: true,
+            status: true,
+            createdAt: true,
+            profile: {
+                select: {
+                    displayName: true,
+                    bio: true,
+                    avatarUrl: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            },
         },
-      },
-    },
-  });
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  return user;
+    });
+    if (!user) {
+        throw new Error('User not found');
+    }
+    return user;
 };
-
 export const updateMyProfile = async (userId, input) => {
-  const profile = await prisma.profile.findUnique({
-    where: {
-      userId,
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  if (!profile) {
-    throw new Error('Profile not found');
-  }
-
-  const updatedProfile = await prisma.profile.update({
-    where: {
-      userId,
-    },
-    data: {
-      ...(input.displayName !== undefined ? { displayName: input.displayName } : {}),
-      ...(input.bio !== undefined ? { bio: input.bio } : {}),
-      ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
-    },
-  });
-
-  return updatedProfile;
-};
-
-export const getPublicProfile = async (username) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      username: username.toLowerCase(),
-    },
-    select: {
-      id: true,
-      username: true,
-      profile: {
-        select: {
-          displayName: true,
-          bio: true,
-          avatarUrl: true,
-          createdAt: true,
+    const profile = await prisma.profile.findUnique({
+        where: { userId },
+        select: { id: true },
+    });
+    if (!profile) {
+        throw new Error('Profile not found');
+    }
+    const updatedProfile = await prisma.profile.update({
+        where: { userId },
+        data: {
+            ...(input.displayName !== undefined ? { displayName: input.displayName } : {}),
+            ...(input.bio !== undefined ? { bio: input.bio } : {}),
+            ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
         },
-      },
-    },
-  });
-
-  if (!user) {
-    throw new Error('Profile not found');
-  }
-
-  return user;
+    });
+    return updatedProfile;
 };
+export const getPublicProfile = async (username) => {
+    const user = await prisma.user.findUnique({
+        where: { username: username.toLowerCase() },
+        select: {
+            id: true,
+            username: true,
+            profile: {
+                select: {
+                    displayName: true,
+                    bio: true,
+                    avatarUrl: true,
+                    createdAt: true,
+                },
+            },
+        },
+    });
+    if (!user) {
+        throw new Error('Profile not found');
+    }
+    return user;
+};
+//# sourceMappingURL=profile.service.js.map
