@@ -7,6 +7,7 @@ import { ZodError } from 'zod';
 
 import { env } from './config/env.js';
 import authRoutes from './routes/auth.routes.js';
+import musicRoutes from './routes/music.routes.js';
 import postRoutes from './routes/post.routes.js';
 import profileRoutes from './routes/profile.routes.js';
 
@@ -43,6 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/music', musicRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/profile', profileRoutes);
 
