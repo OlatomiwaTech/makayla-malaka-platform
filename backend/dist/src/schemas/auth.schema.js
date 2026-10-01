@@ -1,45 +1,24 @@
 import { z } from 'zod';
-
-const usernameSchema = z
-  .string()
-  .trim()
-  .min(3, 'Username must be at least 3 characters')
-  .max(30, 'Username must not exceed 30 characters')
-  .regex(
-    /^[a-zA-Z0-9_]+$/,
-    'Username can only contain letters, numbers, and underscores',
-  );
-
-const passwordSchema = z
-  .string()
-  .min(8, 'Password must be at least 8 characters')
-  .max(72, 'Password must not exceed 72 characters');
-
+const emptyStringToUndefined = (value) => {
+    if (typeof value !== 'string')
+        return value;
+    const trimmed = value.trim();
+    return trimmed.length === 0 ? undefined : trimmed;
+};
 export const registerSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .email('Enter a valid email address')
-    .transform((value) => value.toLowerCase()),
-
-  username: usernameSchema.transform((value) =>
-    value.toLowerCase(),
-  ),
-
-  displayName: z
-    .string()
-    .trim()
-    .min(2, 'Display name must be at least 2 characters')
-    .max(60, 'Display name must not exceed 60 characters'),
-
-  password: passwordSchema,
+    email: z.email('Please enter a valid email address.'),
+    username: z
+        .string()
+        .trim()
+        .min(3, 'Username must be at least 3 characters long.')
+        .max(30, 'Username must be at most 30 characters long.')
+        .regex(/^[a-zA-Z0-9_.-]+$/, 'Username can only contain letters, numbers, underscores, dots, and dashes.'),
+    password: z.string().min(8, 'Password must be at least 8 characters long.').max(128),
+    displayName: z.preprocess(emptyStringToUndefined, z.string().min(2, 'Display name must be at least 2 characters long.').max(50, 'Display name must be at most 50 characters long.').optional()),
+    bio: z.preprocess(emptyStringToUndefined, z.string().max(250, 'Bio must be at most 250 characters long.').optional()),
 });
-
 export const loginSchema = z.object({
-  identifier: z.string().trim().min(1, 'Email or username is required'),
-
-  password: passwordSchema,
+    email: z.email('Please enter a valid email address.'),
+    password: z.string().min(8, 'Password must be at least 8 characters long.').max(128),
 });
-
-export type RegisterInput = z.infer<typeof registerSchema>;
-export type LoginInput = z.infer<typeof loginSchema>;
+//# sourceMappingURL=auth.schema.js.map
