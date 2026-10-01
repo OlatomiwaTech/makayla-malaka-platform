@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 
 import {
   createPost,
+  deletePost,
   getPublishedPostById,
   getPublishedPosts,
   updatePost,
@@ -37,9 +38,18 @@ export const update = async (
   res: Response,
 ) => {
   const input = updatePostSchema.parse(req.body);
+  const postId = req.params.id;
+
+  if (!postId || Array.isArray(postId)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Post id is required.',
+    });
+  }
 
   const post = await updatePost(
-    req.params.id,
+    postId,
+    req.user!.id,
     input,
   );
 
@@ -48,6 +58,27 @@ export const update = async (
     data: {
       post,
     },
+  });
+};
+
+export const remove = async (
+  req: Request,
+  res: Response,
+) => {
+  const postId = req.params.id;
+
+  if (!postId || Array.isArray(postId)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Post id is required.',
+    });
+  }
+
+  await deletePost(postId, req.user!.id);
+
+  res.status(200).json({
+    success: true,
+    message: 'Post deleted successfully.',
   });
 };
 
@@ -72,8 +103,17 @@ export const getOne = async (
   req: Request,
   res: Response,
 ) => {
+  const postId = req.params.id;
+
+  if (!postId || Array.isArray(postId)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Post id is required.',
+    });
+  }
+
   const post = await getPublishedPostById(
-    req.params.id,
+    postId,
   );
 
   res.status(200).json({

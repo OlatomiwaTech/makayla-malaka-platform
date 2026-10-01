@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { createNewPost, deleteExistingPost, getAllPosts, getSinglePost, updateExistingPost, } from '../posts/post.controller.js';
+import { create, getOne, list, remove, update, } from '../posts/post.controller.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 const router = Router();
-router.get('/', getAllPosts);
-router.get('/:id', getSinglePost);
-router.post('/', requireAuth, createNewPost);
-router.patch('/:id', requireAuth, updateExistingPost);
-router.delete('/:id', requireAuth, deleteExistingPost);
+router.get('/', list);
+router.get('/:id', getOne);
+router.post('/', requireAuth, create);
+router.patch('/:id', requireAuth, update);
+router.delete('/:id', requireAuth, remove);
 export default router;
 //# sourceMappingURL=post.routes.js.map
