@@ -1,14 +1,18 @@
 import { prisma } from '../lib/prisma.js';
 import { extractYouTubeVideoId, getYouTubeEmbedUrl, getYouTubeThumbnailUrl, } from '../lib/youtube.js';
-const requireYouTubeVideoId = (youtubeUrl) => {
-    const videoId = extractYouTubeVideoId(youtubeUrl);
-    if (!videoId) {
-        throw new Error('Enter a valid YouTube URL');
-    }
-    return videoId;
-};
 export const createVideo = async (input) => {
-    const youtubeVideoId = requireYouTubeVideoId(input.youtubeUrl);
+    const youtubeVideoId = extractYouTubeVideoId(input.youtubeUrl);
+    if (!youtubeVideoId) {
+        throw new Error('Invalid YouTube video URL');
+    }
+    const existingVideo = await prisma.video.findUnique({
+        where: {
+            youtubeVideoId,
+        },
+    });
+    if (existingVideo) {
+        throw new Error('This YouTube video has already been added');
+    }
     return prisma.video.create({
         data: {
             youtubeVideoId,
@@ -16,9 +20,8 @@ export const createVideo = async (input) => {
             ...(input.description !== undefined
                 ? { description: input.description }
                 : {}),
-            ...(input.thumbnailUrl !== undefined
-                ? { thumbnailUrl: input.thumbnailUrl }
-                : { thumbnailUrl: getYouTubeThumbnailUrl(youtubeVideoId) }),
+            thumbnailUrl: input.thumbnailUrl ??
+                getYouTubeThumbnailUrl(youtubeVideoId),
             videoUrl: getYouTubeEmbedUrl(youtubeVideoId),
             category: input.category,
             status: input.status,
@@ -35,6 +38,24 @@ export const updateVideo = async (videoId, input) => {
     if (!existingVideo) {
         throw new Error('Video not found');
     }
+    let youtubeVideoId = existingVideo.youtubeVideoId;
+    if (input.youtubeUrl) {
+        const extractedId = extractYouTubeVideoId(input.youtubeUrl);
+        if (!extractedId) {
+            throw new Error('Invalid YouTube video URL');
+        }
+        youtubeVideoId = extractedId;
+        if (youtubeVideoId !== existingVideo.youtubeVideoId) {
+            const duplicateVideo = await prisma.video.findUnique({
+                where: {
+                    youtubeVideoId,
+                },
+            });
+            if (duplicateVideo) {
+                throw new Error('This YouTube video has already been added');
+            }
+        }
+    }
     let publishedAt = existingVideo.publishedAt;
     if (input.status === 'PUBLISHED' &&
         existingVideo.status !== 'PUBLISHED') {
@@ -43,23 +64,11 @@ export const updateVideo = async (videoId, input) => {
     if (input.status === 'DRAFT') {
         publishedAt = null;
     }
-    const youtubeVideoId = input.youtubeUrl !== undefined
-        ? requireYouTubeVideoId(input.youtubeUrl)
-        : undefined;
-    const thumbnailUrl = input.thumbnailUrl !== undefined
-        ? input.thumbnailUrl
-        : youtubeVideoId !== undefined
-            ? getYouTubeThumbnailUrl(youtubeVideoId)
-            : undefined;
     return prisma.video.update({
         where: { id: videoId },
         data: {
-            ...(youtubeVideoId !== undefined
-                ? {
-                    youtubeVideoId,
-                    videoUrl: getYouTubeEmbedUrl(youtubeVideoId),
-                }
-                : {}),
+            youtubeVideoId,
+            videoUrl: getYouTubeEmbedUrl(youtubeVideoId),
             ...(input.title !== undefined
                 ? { title: input.title }
                 : {}),
@@ -68,8 +77,10 @@ export const updateVideo = async (videoId, input) => {
                 : {}),
             ...(input.thumbnailUrl !== undefined
                 ? { thumbnailUrl: input.thumbnailUrl }
-                : thumbnailUrl !== undefined
-                    ? { thumbnailUrl }
+                : input.youtubeUrl
+                    ? {
+                        thumbnailUrl: getYouTubeThumbnailUrl(youtubeVideoId),
+                    }
                     : {}),
             ...(input.category !== undefined
                 ? { category: input.category }
