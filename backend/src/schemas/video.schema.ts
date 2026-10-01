@@ -1,6 +1,12 @@
 import { z } from 'zod';
 
 export const createVideoSchema = z.object({
+  youtubeVideoId: z
+    .string()
+    .trim()
+    .min(1)
+    .max(20),
+
   title: z
     .string()
     .trim()

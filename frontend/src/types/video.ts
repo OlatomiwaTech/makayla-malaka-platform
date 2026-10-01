@@ -1,5 +1,6 @@
 export type Video = {
   id: string;
+  youtubeVideoId: string;
   title: string;
   description: string | null;
   thumbnailUrl: string | null;
