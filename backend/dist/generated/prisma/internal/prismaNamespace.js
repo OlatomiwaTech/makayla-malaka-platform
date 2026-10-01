@@ -156,7 +156,9 @@ export const MusicReleaseScalarFieldEnum = {
     description: 'description',
     coverUrl: 'coverUrl',
     releaseDate: 'releaseDate',
+    type: 'type',
     status: 'status',
+    isFeatured: 'isFeatured',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
@@ -165,7 +167,8 @@ export const TrackScalarFieldEnum = {
     releaseId: 'releaseId',
     title: 'title',
     trackNumber: 'trackNumber',
-    durationSeconds: 'durationSeconds'
+    durationSeconds: 'durationSeconds',
+    previewUrl: 'previewUrl'
 };
 export const MusicPlatformLinkScalarFieldEnum = {
     id: 'id',

@@ -23,6 +23,11 @@ export const PostStatus = {
     PUBLISHED: 'PUBLISHED',
     ARCHIVED: 'ARCHIVED'
 };
+export const ReleaseType = {
+    SINGLE: 'SINGLE',
+    EP: 'EP',
+    ALBUM: 'ALBUM'
+};
 export const ReleaseStatus = {
     DRAFT: 'DRAFT',
     PUBLISHED: 'PUBLISHED',
