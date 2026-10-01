@@ -82,7 +82,8 @@ export const ModelName = {
     EventRegistration: 'EventRegistration',
     Notification: 'Notification',
     FanSubmission: 'FanSubmission',
-    ModerationReport: 'ModerationReport'
+    ModerationReport: 'ModerationReport',
+    RefreshToken: 'RefreshToken'
 };
 /**
  * Enums
@@ -234,6 +235,14 @@ export const ModerationReportScalarFieldEnum = {
     reason: 'reason',
     resolved: 'resolved',
     resolvedAt: 'resolvedAt',
+    createdAt: 'createdAt'
+};
+export const RefreshTokenScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    tokenHash: 'tokenHash',
+    expiresAt: 'expiresAt',
+    revokedAt: 'revokedAt',
     createdAt: 'createdAt'
 };
 export const SortOrder = {
