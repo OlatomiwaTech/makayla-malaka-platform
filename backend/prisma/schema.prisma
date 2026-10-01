@@ -91,6 +91,7 @@ model User {
   notifications  Notification[]
   submissions    FanSubmission[]
   reports        ModerationReport[]
+  refreshTokens  RefreshToken[]
 }
 
 model Profile {
