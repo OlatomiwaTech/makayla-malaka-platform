@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import express, { type ErrorRequestHandler } from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { ZodError } from 'zod';
 
 import { env } from './config/env.js';
 import authRoutes from './routes/auth.routes.js';
@@ -49,8 +50,53 @@ app.get('/health', (_req, res) => {
   });
 });
 
-const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+const errorHandler: ErrorRequestHandler = (
+  err,
+  _req,
+  res,
+  _next,
+) => {
   console.error(err);
+
+  if (err instanceof ZodError) {
+    res.status(400).json({
+      success: false,
+      message: 'Validation failed',
+      errors: err.flatten().fieldErrors,
+    });
+
+    return;
+  }
+
+  if (
+    err instanceof Error &&
+    err.message === 'Email or username is already in use'
+  ) {
+    res.status(409).json({
+      success: false,
+      message: err.message,
+    });
+
+    return;
+  }
+
+  if (
+    err instanceof Error &&
+    [
+      'Invalid credentials',
+      'This account is not active',
+      'Invalid refresh token',
+      'Refresh token has been revoked',
+      'Refresh token has expired',
+    ].includes(err.message)
+  ) {
+    res.status(401).json({
+      success: false,
+      message: err.message,
+    });
+
+    return;
+  }
 
   res.status(500).json({
     success: false,
