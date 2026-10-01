@@ -10,7 +10,10 @@ export const requireAuth = (req, res, next) => {
     try {
         const token = authorization.replace('Bearer ', '').trim();
         const payload = verifyToken(token);
-        req.user = payload;
+        req.user = {
+            id: payload.sub,
+            role: payload.role,
+        };
         return next();
     }
     catch {
