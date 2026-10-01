@@ -250,6 +250,7 @@ model Video {
   updatedAt DateTime @updatedAt
 
   @@index([status, publishedAt])
+  @@index([category, status])
 }
 
 model Event {
