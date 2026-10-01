@@ -9,6 +9,7 @@ import authRoutes from './routes/auth.routes.js';
 import musicRoutes from './routes/music.routes.js';
 import postRoutes from './routes/post.routes.js';
 import profileRoutes from './routes/profile.routes.js';
+import videoRoutes from './routes/video.routes.js';
 const app = express();
 app.disable('x-powered-by');
 app.use(helmet({
@@ -33,6 +34,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/music', musicRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/videos', videoRoutes);
 app.get('/health', (_req, res) => {
     res.status(200).json({
         success: true,
