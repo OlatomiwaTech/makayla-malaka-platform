@@ -1,10 +1,13 @@
 import type { NextFunction, Request, Response } from 'express';
 
 import { verifyToken } from '../lib/auth.js';
-import type { AuthTokenPayload } from '../types/auth.js';
+import type { UserRole } from '../../generated/prisma/client.js';
 
 export type AuthenticatedRequest = Request & {
-  user?: AuthTokenPayload;
+  user?: {
+    id: string;
+    role: UserRole;
+  };
 };
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
@@ -20,7 +23,12 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
   try {
     const token = authorization.replace('Bearer ', '').trim();
     const payload = verifyToken(token);
-    (req as AuthenticatedRequest).user = payload;
+
+    (req as AuthenticatedRequest).user = {
+      id: payload.sub,
+      role: payload.role,
+    };
+
     return next();
   } catch {
     return res.status(401).json({
