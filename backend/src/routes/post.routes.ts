@@ -4,17 +4,37 @@ import {
   create,
   getOne,
   list,
-  remove,
   update,
 } from '../posts/post.controller.js';
-import { requireAuth } from '../middleware/auth.middleware.js';
+
+import { authenticate } from '../middleware/auth.middleware.js';
+import { requireRoles } from '../middleware/role.middleware.js';
+import { asyncHandler } from '../middleware/async-handler.js';
 
 const router = Router();
 
-router.get('/', list);
-router.get('/:id', getOne);
-router.post('/', requireAuth, create);
-router.patch('/:id', requireAuth, update);
-router.delete('/:id', requireAuth, remove);
+router.get(
+  '/',
+  asyncHandler(list),
+);
+
+router.get(
+  '/:id',
+  asyncHandler(getOne),
+);
+
+router.post(
+  '/',
+  authenticate,
+  requireRoles('EDITOR', 'ADMIN'),
+  asyncHandler(create),
+);
+
+router.patch(
+  '/:id',
+  authenticate,
+  requireRoles('EDITOR', 'ADMIN'),
+  asyncHandler(update),
+);
 
 export default router;
