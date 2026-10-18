@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowUpRight, Facebook, Instagram, Music2, Youtube } from 'lucide-react';
+import { ArrowUpRight, Camera, Music2, Play, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Community',
@@ -8,9 +8,9 @@ export const metadata: Metadata = {
 };
 
 const channels = [
-  { label: 'Instagram', description: 'Photos, Refixes and everyday moments.', href: 'https://www.instagram.com/makaylasuperstar/?hl=en', icon: Instagram },
-  { label: 'Facebook', description: 'News and updates from Makayla’s official page.', href: 'https://www.facebook.com/makaylasuperstar/', icon: Facebook },
-  { label: 'YouTube', description: 'Official videos and new performances.', href: 'https://www.youtube.com/@MakaylaSuperstar', icon: Youtube },
+  { label: 'Instagram', description: 'Photos, Refixes and everyday moments.', href: 'https://www.instagram.com/makaylasuperstar/?hl=en', icon: Camera },
+  { label: 'Facebook', description: 'News and updates from Makayla’s official page.', href: 'https://www.facebook.com/makaylasuperstar/', icon: Users },
+  { label: 'YouTube', description: 'Official videos and new performances.', href: 'https://www.youtube.com/@MakaylaSuperstar', icon: Play },
   { label: 'YouTube Music', description: 'Listen to Makayla’s music catalogue.', href: 'https://music.youtube.com/channel/UCNY3D79_l_o0MIAL_sOOcog', icon: Music2 },
 ];
 
