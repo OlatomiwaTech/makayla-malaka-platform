@@ -154,6 +154,8 @@ const errorHandler: ErrorRequestHandler = (
       'This YouTube video has already been added',
       'Video not found',
       'YouTube video was not found or is not publicly available',
+      'This video is not from Makayla’s official YouTube channel',
+      'Could not verify the YouTube channel for this video',
     ].includes(err.message)
   ) {
     res.status(400).json({
@@ -168,6 +170,18 @@ const errorHandler: ErrorRequestHandler = (
     res.status(404).json({
       success: false,
       message: err.message,
+    });
+
+    return;
+  }
+
+  if (
+    err instanceof Error &&
+    err.message === 'YouTube channel verification is not configured'
+  ) {
+    res.status(503).json({
+      success: false,
+      message: 'YouTube channel verification is not configured. Add YOUTUBE_API_KEY and YOUTUBE_CHANNEL_ID to the backend environment, then restart the backend.',
     });
 
     return;
@@ -195,7 +209,7 @@ const errorHandler: ErrorRequestHandler = (
   ) {
     res.status(502).json({
       success: false,
-      message: 'Could not reach YouTube to analyze this link. Check that the backend can make outbound HTTPS requests to www.youtube.com. If using YOUTUBE_API_KEY, allow www.googleapis.com too. You can still add the video by entering its title manually; a standard thumbnail will be generated.',
+      message: 'Could not verify this video with YouTube. Check that the backend can make outbound HTTPS requests to www.googleapis.com. The video was not added; try again when the YouTube API is reachable.',
     });
 
     return;

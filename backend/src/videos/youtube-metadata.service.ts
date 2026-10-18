@@ -10,11 +10,12 @@ export type YouTubeVideoMetadata = {
   sourcePublishedAt: Date | null;
   durationSeconds: number | null;
   categoryId: string | null;
-  metadataSource: 'youtube-data-api' | 'youtube-oembed';
+  metadataSource: 'youtube-data-api';
 };
 
 type YouTubeApiVideo = {
   snippet?: {
+    channelId?: string;
     title?: string;
     description?: string;
     channelTitle?: string;
@@ -70,6 +71,7 @@ const requestJson = async <T>(url: URL): Promise<T> => {
 const metadataFromYouTubeApi = async (
   videoId: string,
   apiKey: string,
+  approvedChannelId: string,
 ): Promise<YouTubeVideoMetadata> => {
   const url = new URL('https://www.googleapis.com/youtube/v3/videos');
   url.searchParams.set('part', 'snippet,contentDetails');
@@ -79,6 +81,14 @@ const metadataFromYouTubeApi = async (
   const result = await requestJson<{ items?: YouTubeApiVideo[] }>(url);
   const video = result.items?.[0];
   const snippet = video?.snippet;
+
+  if (!snippet?.channelId) {
+    throw new Error('Could not verify the YouTube channel for this video');
+  }
+
+  if (snippet.channelId !== approvedChannelId) {
+    throw new Error('This video is not from Makayla’s official YouTube channel');
+  }
 
   if (!snippet?.title) {
     throw new Error('YouTube video was not found or is not publicly available');
@@ -112,37 +122,6 @@ const metadataFromYouTubeApi = async (
   };
 };
 
-const metadataFromOEmbed = async (
-  videoId: string,
-  originalUrl: string,
-): Promise<YouTubeVideoMetadata> => {
-  const url = new URL('https://www.youtube.com/oembed');
-  url.searchParams.set('url', originalUrl);
-  url.searchParams.set('format', 'json');
-
-  const result = await requestJson<{
-    title?: string;
-    author_name?: string;
-    thumbnail_url?: string;
-  }>(url);
-
-  if (!result.title) {
-    throw new Error('YouTube video was not found or is not publicly available');
-  }
-
-  return {
-    videoId,
-    title: result.title,
-    description: null,
-    thumbnailUrl: result.thumbnail_url ?? getYouTubeThumbnailUrl(videoId),
-    channelTitle: result.author_name ?? null,
-    sourcePublishedAt: null,
-    durationSeconds: null,
-    categoryId: null,
-    metadataSource: 'youtube-oembed',
-  };
-};
-
 export const getYouTubeVideoMetadata = async (
   value: string,
 ): Promise<YouTubeVideoMetadata> => {
@@ -152,12 +131,11 @@ export const getYouTubeVideoMetadata = async (
   }
 
   const apiKey = env.YOUTUBE_API_KEY;
-  if (apiKey) {
-    return metadataFromYouTubeApi(videoId, apiKey);
+  const approvedChannelId = env.YOUTUBE_CHANNEL_ID;
+
+  if (!apiKey || !approvedChannelId) {
+    throw new Error('YouTube channel verification is not configured');
   }
 
-  return metadataFromOEmbed(
-    videoId,
-    `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`,
-  );
+  return metadataFromYouTubeApi(videoId, apiKey, approvedChannelId);
 };

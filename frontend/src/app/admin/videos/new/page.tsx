@@ -64,7 +64,7 @@ type VideoPreview = {
   sourcePublishedAt: string | null;
   durationSeconds: number | null;
   categoryId: string | null;
-  metadataSource: 'youtube-data-api' | 'youtube-oembed';
+  metadataSource: 'youtube-data-api';
 };
 
 type PreviewResponse = {

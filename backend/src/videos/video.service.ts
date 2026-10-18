@@ -14,13 +14,6 @@ import { getYouTubeVideoMetadata } from './youtube-metadata.service.js';
 export const previewVideo = (url: string) =>
   getYouTubeVideoMetadata(url);
 
-const canUseManualVideoMetadata = (error: unknown) =>
-  error instanceof Error &&
-  [
-    'YouTube metadata service is unreachable',
-    'YouTube metadata request timed out',
-  ].includes(error.message);
-
 export const createVideo = async (
   input: CreateVideoInput,
 ) => {
@@ -31,14 +24,7 @@ export const createVideo = async (
     throw new Error('Invalid YouTube video URL');
   }
 
-  let metadata: Awaited<ReturnType<typeof getYouTubeVideoMetadata>> | null;
-
-  try {
-    metadata = await getYouTubeVideoMetadata(input.youtubeUrl);
-  } catch (error) {
-    if (!canUseManualVideoMetadata(error)) throw error;
-    metadata = null;
-  }
+  const metadata = await getYouTubeVideoMetadata(input.youtubeUrl);
 
   const existingVideo = await prisma.video.findUnique({
     where: {
@@ -55,18 +41,18 @@ export const createVideo = async (
   return prisma.video.create({
     data: {
       youtubeVideoId,
-      title: input.title || metadata?.title || 'Untitled video',
-      description: input.description?.trim() || metadata?.description || null,
+      title: input.title || metadata.title,
+      description: input.description?.trim() || metadata.description,
       seoTitle: input.seoTitle || null,
       seoDescription: input.seoDescription || null,
       thumbnailUrl:
         input.thumbnailUrl ??
-        metadata?.thumbnailUrl ??
+        metadata.thumbnailUrl ??
         getYouTubeThumbnailUrl(youtubeVideoId),
-      channelTitle: metadata?.channelTitle ?? null,
-      sourcePublishedAt: metadata?.sourcePublishedAt ?? null,
-      durationSeconds: metadata?.durationSeconds ?? null,
-      youtubeCategoryId: metadata?.categoryId ?? null,
+      channelTitle: metadata.channelTitle,
+      sourcePublishedAt: metadata.sourcePublishedAt,
+      durationSeconds: metadata.durationSeconds,
+      youtubeCategoryId: metadata.categoryId,
       videoUrl: getYouTubeEmbedUrl(youtubeVideoId),
       category: input.category,
       status: input.status,

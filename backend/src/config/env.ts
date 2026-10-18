@@ -25,6 +25,12 @@ const envSchema = z.object({
     .optional(),
 
   YOUTUBE_API_KEY: z.string().trim().min(1).optional(),
+
+  YOUTUBE_CHANNEL_ID: z
+    .string()
+    .trim()
+    .regex(/^UC[A-Za-z0-9_-]{22}$/, 'YOUTUBE_CHANNEL_ID must be a YouTube channel ID')
+    .optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
