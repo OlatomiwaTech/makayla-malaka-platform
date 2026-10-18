@@ -261,7 +261,7 @@ export const duplicateRelease = async (releaseId) => {
     const release = await getManagedReleaseById(releaseId);
     return prisma.musicRelease.create({
         data: {
-            title: `${release.title} (Copy)`,
+            title: `${release.title.slice(0, 143)} (Copy)`,
             artistName: release.artistName,
             description: release.description,
             coverUrl: release.coverUrl,

@@ -18,6 +18,21 @@ const trackSchema = z.object({
   durationSeconds: z.number().int().positive().optional(),
   previewUrl: optionalUrlSchema,
 });
+const tracksSchema = z.array(trackSchema).min(1, 'Add at least one track').superRefine(
+  (tracks, context) => {
+    const trackNumbers = new Set<number>();
+    tracks.forEach((track, index) => {
+      if (trackNumbers.has(track.trackNumber)) {
+        context.addIssue({
+          code: 'custom',
+          path: [index, 'trackNumber'],
+          message: 'Track numbers must be unique.',
+        });
+      }
+      trackNumbers.add(track.trackNumber);
+    });
+  },
+);
 const linkSchema = z.object({
   platform: z.string().trim().min(1, 'Platform is required').max(40),
   url: z.string().trim().url('Enter a valid listening link'),
@@ -34,7 +49,7 @@ const formSchema = z.object({
   type: z.enum(['SINGLE', 'EP', 'ALBUM']),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
   isFeatured: z.boolean(),
-  tracks: z.array(trackSchema).min(1, 'Add at least one track'),
+  tracks: tracksSchema,
   links: z.array(linkSchema),
 });
 

@@ -36,6 +36,25 @@ const platformLinkSchema = z.object({
 		.url(),
 });
 
+const tracksSchema = z
+	.array(trackSchema)
+	.min(1)
+	.superRefine((tracks, context) => {
+		const trackNumbers = new Set<number>();
+
+		tracks.forEach((track, index) => {
+			if (trackNumbers.has(track.trackNumber)) {
+				context.addIssue({
+					code: 'custom',
+					path: [index, 'trackNumber'],
+					message: 'Track numbers must be unique.',
+				});
+			}
+
+			trackNumbers.add(track.trackNumber);
+		});
+	});
+
 export const createReleaseSchema = z.object({
 	title: z
 		.string()
@@ -83,9 +102,7 @@ export const createReleaseSchema = z.object({
 		.boolean()
 		.default(false),
 
-	tracks: z
-		.array(trackSchema)
-		.min(1),
+	tracks: tracksSchema,
 
 	links: z
 		.array(platformLinkSchema)
