@@ -65,10 +65,10 @@ export function Hero({
           <span>MM</span>
         </div>
         <Image
-          src="/Logo.png"
-          alt="Makayla Malaka logo"
-          width={1280}
-          height={1280}
+          src="/makayla-image.jpg"
+          alt="Makayla Malaka"
+          width={474}
+          height={474}
           priority
           sizes="(max-width: 1024px) 100vw, 45vw"
           className="mt-8 h-auto max-h-[440px] w-full max-w-[520px] object-contain"
