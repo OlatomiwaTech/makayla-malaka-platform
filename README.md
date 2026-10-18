@@ -225,6 +225,19 @@ Makayla Platform
 
 The browser communicates with the backend through an API. The backend is responsible for authentication, authorization, validation, business logic, database access, and security.
 
+## Database setup
+
+Set `backend/DATABASE_URL` to the Neon pooled connection string for backend application traffic. Set `backend/DIRECT_URL` to the Neon direct (non-pooler) connection string for Prisma commands; schema migrations should use the direct endpoint. Both variables belong in the ignored `backend/.env` file and should remain private.
+
+After configuring the connection strings, apply the checked-in schema migrations with:
+
+```sh
+cd backend
+npx prisma migrate deploy
+```
+
+This creates or updates the tables in the Neon database without deleting existing data.
+
 ## Planned User Roles
 
 ```text
