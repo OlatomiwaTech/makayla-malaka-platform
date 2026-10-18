@@ -123,6 +123,7 @@ export function AdminMusicReleaseForm({
   const tracks = useWatch({ control, name: 'tracks' });
   const links = useWatch({ control, name: 'links' });
   const status = useWatch({ control, name: 'status' });
+  const releaseType = useWatch({ control, name: 'type' });
 
   const onSubmit = async (formData: FormData) => {
     setServerError(null);
@@ -393,7 +394,7 @@ export function AdminMusicReleaseForm({
               {coverUrl ? <img src={coverUrl} alt="" className="size-full object-cover" /> : <div className="grid size-full place-items-center text-5xl font-semibold text-black/15">M</div>}
             </div>
             <div className="py-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-black/40">{watch('type')} · {status.toLowerCase()}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-black/40">{releaseType} · {status.toLowerCase()}</p>
               <h3 className="mt-2 text-2xl font-semibold">{title || 'Release title'}</h3>
               <p className="mt-1 text-sm text-black/55">{artistName || 'Artist name'}</p>
               <p className="mt-3 text-sm text-black/45">{tracks.filter((track) => track.title.trim()).length} track(s) · {links.length} listening link(s)</p>

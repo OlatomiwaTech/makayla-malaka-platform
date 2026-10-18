@@ -148,8 +148,8 @@ export default function ManageMusicPage() {
         <select aria-label="Filter by release type" value={type} onChange={(event) => applyFilters({ type: event.target.value as ReleaseType | '' })} className="rounded-xl border border-black/10 bg-white px-3 py-3 text-sm">
           {releaseTypes.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
         </select>
-        <label className="text-xs text-black/50">From<input aria-label="Release date from" type="date" value={dateFrom} onChange={(event) => applyFilters({ dateFrom: event.target.value })} className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-black" /></label>
-        <label className="text-xs text-black/50">To<input aria-label="Release date to" type="date" value={dateTo} onChange={(event) => applyFilters({ dateTo: event.target.value })} className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-black" /></label>
+        <label className="text-xs text-black/50">From<input aria-label="Release date from" type="date" max={dateTo || undefined} value={dateFrom} onChange={(event) => applyFilters({ dateFrom: event.target.value })} className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-black" /></label>
+        <label className="text-xs text-black/50">To<input aria-label="Release date to" type="date" min={dateFrom || undefined} value={dateTo} onChange={(event) => applyFilters({ dateTo: event.target.value })} className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-black" /></label>
       </form>
 
       {actionError && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">{actionError}</p>}
