@@ -1,8 +1,41 @@
+import type { Metadata } from 'next';
+
 import { Hero } from '@/components/home/hero';
 import { SectionHeader } from '@/components/home/section-header';
 import { MusicSpotlight } from '@/components/home/music-spotlight';
 import { EventSpotlight } from '@/components/home/event-spotlight';
 import { PostList } from '@/components/posts/post-list';
+
+export const metadata: Metadata = {
+  title: 'Official Website',
+  description:
+    'Visit the official Makayla Malaka website for new music, official videos, news, events, and updates from the artist.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    title: 'Makayla Malaka | Official Website',
+    description:
+      'New music, official videos, news, events, and updates from artist Makayla Malaka.',
+    url: '/',
+    images: [
+      {
+        url: '/Logo.png',
+        width: 512,
+        height: 512,
+        alt: 'Makayla Malaka official website',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Makayla Malaka | Official Website',
+    description:
+      'New music, official videos, news, events, and updates from artist Makayla Malaka.',
+    images: ['/Logo.png'],
+  },
+};
 
 export default function HomePage() {
   return (
