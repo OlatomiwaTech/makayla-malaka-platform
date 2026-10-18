@@ -21,11 +21,11 @@ const requestJson = async (url) => {
     }
     return response.json();
 };
-const metadataFromYouTubeApi = async (videoId) => {
+const metadataFromYouTubeApi = async (videoId, apiKey) => {
     const url = new URL('https://www.googleapis.com/youtube/v3/videos');
     url.searchParams.set('part', 'snippet,contentDetails');
     url.searchParams.set('id', videoId);
-    url.searchParams.set('key', env.YOUTUBE_API_KEY);
+    url.searchParams.set('key', apiKey);
     const result = await requestJson(url);
     const video = result.items?.[0];
     const snippet = video?.snippet;
@@ -81,8 +81,9 @@ export const getYouTubeVideoMetadata = async (value) => {
     if (!videoId) {
         throw new Error('Invalid YouTube video URL');
     }
-    if (env.YOUTUBE_API_KEY) {
-        return metadataFromYouTubeApi(videoId);
+    const apiKey = env.YOUTUBE_API_KEY;
+    if (apiKey) {
+        return metadataFromYouTubeApi(videoId, apiKey);
     }
     return metadataFromOEmbed(videoId, `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`);
 };
