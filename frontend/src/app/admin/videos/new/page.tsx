@@ -190,7 +190,7 @@ export default function NewVideoPage() {
 
       setServerError(
         status === 401
-          ? 'Please sign in with an editor or admin account before adding a video.'
+          ? 'Please sign in with a content manager, editor, or admin account before adding a video.'
           : status === 403
             ? 'Your account is not authorized to manage videos.'
             : message,

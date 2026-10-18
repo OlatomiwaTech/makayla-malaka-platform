@@ -186,6 +186,10 @@ export const VideoScalarFieldEnum = {
     category: 'category',
     status: 'status',
     publishedAt: 'publishedAt',
+    sourcePublishedAt: 'sourcePublishedAt',
+    durationSeconds: 'durationSeconds',
+    channelTitle: 'channelTitle',
+    youtubeCategoryId: 'youtubeCategoryId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };

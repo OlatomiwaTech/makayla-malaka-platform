@@ -55,11 +55,12 @@ const requestJson = async <T>(url: URL): Promise<T> => {
 
 const metadataFromYouTubeApi = async (
   videoId: string,
+  apiKey: string,
 ): Promise<YouTubeVideoMetadata> => {
   const url = new URL('https://www.googleapis.com/youtube/v3/videos');
   url.searchParams.set('part', 'snippet,contentDetails');
   url.searchParams.set('id', videoId);
-  url.searchParams.set('key', env.YOUTUBE_API_KEY!);
+  url.searchParams.set('key', apiKey);
 
   const result = await requestJson<{ items?: YouTubeApiVideo[] }>(url);
   const video = result.items?.[0];
@@ -136,8 +137,9 @@ export const getYouTubeVideoMetadata = async (
     throw new Error('Invalid YouTube video URL');
   }
 
-  if (env.YOUTUBE_API_KEY) {
-    return metadataFromYouTubeApi(videoId);
+  const apiKey = env.YOUTUBE_API_KEY;
+  if (apiKey) {
+    return metadataFromYouTubeApi(videoId, apiKey);
   }
 
   return metadataFromOEmbed(

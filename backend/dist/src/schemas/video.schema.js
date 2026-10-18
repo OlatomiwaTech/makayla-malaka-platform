@@ -80,4 +80,7 @@ export const videoListQuerySchema = z.object({
         .trim()
         .optional(),
 });
+export const videoPreviewQuerySchema = z.object({
+    url: youtubeUrlSchema,
+});
 //# sourceMappingURL=video.schema.js.map

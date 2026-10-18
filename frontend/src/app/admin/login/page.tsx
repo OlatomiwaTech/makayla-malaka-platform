@@ -79,7 +79,7 @@ export default function AdminLoginPage() {
           Sign in
         </h1>
         <p className="mt-3 text-sm leading-6 text-black/50">
-          Sign in with an editor or admin account to manage catalogues.
+          Sign in with a content manager, editor, or admin account to manage catalogues.
         </p>
       </div>
 

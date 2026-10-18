@@ -17,6 +17,7 @@ const envSchema = z.object({
         .string()
         .min(32, 'ADMIN_SETUP_KEY must be at least 32 characters')
         .optional(),
+    YOUTUBE_API_KEY: z.string().trim().min(1).optional(),
 });
 const parsedEnv = envSchema.safeParse(process.env);
 if (!parsedEnv.success) {

@@ -7,18 +7,26 @@ export const extractYouTubeVideoId = (value) => {
             .replace(/^www\./, '');
         let videoId = null;
         if (hostname === 'youtu.be') {
-            videoId = url.pathname.slice(1);
+            videoId = url.pathname.split('/')[1] ?? null;
         }
-        if (hostname === 'youtube.com') {
+        if (hostname === 'youtube.com' ||
+            hostname === 'm.youtube.com' ||
+            hostname === 'music.youtube.com') {
             if (url.pathname === '/watch') {
                 videoId = url.searchParams.get('v');
             }
             else if (url.pathname.startsWith('/shorts/')) {
                 videoId = url.pathname.split('/')[2] ?? null;
             }
+            else if (url.pathname.startsWith('/live/')) {
+                videoId = url.pathname.split('/')[2] ?? null;
+            }
             else if (url.pathname.startsWith('/embed/')) {
                 videoId = url.pathname.split('/')[2] ?? null;
             }
+        }
+        if (hostname === 'youtube-nocookie.com' && url.pathname.startsWith('/embed/')) {
+            videoId = url.pathname.split('/')[2] ?? null;
         }
         if (!videoId ||
             videoId.length !== YOUTUBE_VIDEO_ID_LENGTH ||

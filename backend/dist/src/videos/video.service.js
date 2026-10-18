@@ -1,10 +1,13 @@
 import { prisma } from '../lib/prisma.js';
 import { extractYouTubeVideoId, getYouTubeEmbedUrl, getYouTubeThumbnailUrl, } from '../lib/youtube.js';
+import { getYouTubeVideoMetadata } from './youtube-metadata.service.js';
+export const previewVideo = (url) => getYouTubeVideoMetadata(url);
 export const createVideo = async (input) => {
     const youtubeVideoId = extractYouTubeVideoId(input.youtubeUrl);
     if (!youtubeVideoId) {
         throw new Error('Invalid YouTube video URL');
     }
+    const metadata = await getYouTubeVideoMetadata(input.youtubeUrl);
     const existingVideo = await prisma.video.findUnique({
         where: {
             youtubeVideoId,
@@ -16,12 +19,15 @@ export const createVideo = async (input) => {
     return prisma.video.create({
         data: {
             youtubeVideoId,
-            title: input.title,
-            ...(input.description !== undefined
-                ? { description: input.description }
-                : {}),
+            title: input.title || metadata.title,
+            description: input.description?.trim() || metadata.description,
             thumbnailUrl: input.thumbnailUrl ??
+                metadata.thumbnailUrl ??
                 getYouTubeThumbnailUrl(youtubeVideoId),
+            channelTitle: metadata.channelTitle,
+            sourcePublishedAt: metadata.sourcePublishedAt,
+            durationSeconds: metadata.durationSeconds,
+            youtubeCategoryId: metadata.categoryId,
             videoUrl: getYouTubeEmbedUrl(youtubeVideoId),
             category: input.category,
             status: input.status,
@@ -39,11 +45,13 @@ export const updateVideo = async (videoId, input) => {
         throw new Error('Video not found');
     }
     let youtubeVideoId = existingVideo.youtubeVideoId;
+    let metadata = null;
     if (input.youtubeUrl) {
         const extractedId = extractYouTubeVideoId(input.youtubeUrl);
         if (!extractedId) {
             throw new Error('Invalid YouTube video URL');
         }
+        metadata = await getYouTubeVideoMetadata(input.youtubeUrl);
         youtubeVideoId = extractedId;
         if (youtubeVideoId !== existingVideo.youtubeVideoId) {
             const duplicateVideo = await prisma.video.findUnique({
@@ -75,11 +83,19 @@ export const updateVideo = async (videoId, input) => {
             ...(input.description !== undefined
                 ? { description: input.description }
                 : {}),
+            ...(metadata
+                ? {
+                    channelTitle: metadata.channelTitle,
+                    sourcePublishedAt: metadata.sourcePublishedAt,
+                    durationSeconds: metadata.durationSeconds,
+                    youtubeCategoryId: metadata.categoryId,
+                }
+                : {}),
             ...(input.thumbnailUrl !== undefined
                 ? { thumbnailUrl: input.thumbnailUrl }
-                : input.youtubeUrl
+                : metadata
                     ? {
-                        thumbnailUrl: getYouTubeThumbnailUrl(youtubeVideoId),
+                        thumbnailUrl: metadata.thumbnailUrl,
                     }
                     : {}),
             ...(input.category !== undefined

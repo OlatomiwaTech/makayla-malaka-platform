@@ -122,7 +122,7 @@ export default function NewMusicReleasePage() {
             : 'Unable to save this release. Please try again.';
       setServerError(
         status === 401
-          ? 'Please sign in with an editor or admin account before adding a release.'
+          ? 'Please sign in with a content manager, editor, or admin account before adding a release.'
           : status === 403
             ? 'Your account is not authorized to manage releases.'
             : message,

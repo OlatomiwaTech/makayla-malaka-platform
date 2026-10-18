@@ -112,10 +112,19 @@ const errorHandler = (err, _req, res, _next) => {
             'Invalid YouTube video URL',
             'This YouTube video has already been added',
             'Video not found',
+            'YouTube video was not found or is not publicly available',
         ].includes(err.message)) {
         res.status(400).json({
             success: false,
             message: err.message,
+        });
+        return;
+    }
+    if (err instanceof Error &&
+        err.message.startsWith('YouTube metadata request failed')) {
+        res.status(502).json({
+            success: false,
+            message: `${err.message}. Check the YouTube Data API key and quota, or try again later.`,
         });
         return;
     }
