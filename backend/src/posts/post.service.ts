@@ -145,7 +145,7 @@ export const getPublishedPosts = async (
 ) => {
   const skip = (page - 1) * limit;
 
-  const [posts, total] = await prisma.$transaction([
+  const [posts, total] = await Promise.all([
     prisma.post.findMany({
       where: {
         status: 'PUBLISHED',
