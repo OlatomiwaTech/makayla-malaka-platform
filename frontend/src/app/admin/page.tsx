@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowUpRight, Disc3, Video } from 'lucide-react';
+import { ArrowUpRight, Disc3, UsersRound, Video } from 'lucide-react';
 
 export default function AdminPage() {
   return (
@@ -19,6 +19,12 @@ export default function AdminPage() {
           className="mt-4 inline-flex text-sm font-semibold underline underline-offset-4"
         >
           Sign in with an editor or admin account
+        </Link>
+        <Link
+          href="/admin/setup"
+          className="ml-5 mt-4 inline-flex text-sm font-medium text-black/55 underline underline-offset-4 hover:text-black"
+        >
+          First-time owner setup
         </Link>
       </div>
 
@@ -56,6 +62,24 @@ export default function AdminPage() {
           </h2>
           <p className="mt-2 text-sm leading-6 text-black/50">
             Add a video from Makayla&apos;s official YouTube channel.
+          </p>
+        </Link>
+
+        <Link
+          href="/admin/accounts"
+          className="group rounded-[28px] border border-black/[0.07] bg-white p-7 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div className="flex items-start justify-between">
+            <span className="grid size-12 place-items-center rounded-2xl bg-[#f2f0eb]">
+              <UsersRound size={22} />
+            </span>
+            <ArrowUpRight className="text-black/35 transition group-hover:text-black" size={20} />
+          </div>
+          <h2 className="mt-8 text-2xl font-semibold tracking-[-0.04em]">
+            Manage accounts
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-black/50">
+            Grant or revoke music and video access for registered accounts.
           </p>
         </Link>
       </div>

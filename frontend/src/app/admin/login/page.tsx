@@ -125,6 +125,14 @@ export default function AdminLoginPage() {
       <Link href="/admin" className="mt-6 inline-block text-sm font-medium text-black/55 hover:text-black">
         Back to content studio
       </Link>
+      <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+        <Link href="/register" className="font-medium text-black/55 underline underline-offset-4 hover:text-black">
+          Create a regular account
+        </Link>
+        <Link href="/admin/setup" className="font-medium text-black/55 underline underline-offset-4 hover:text-black">
+          First-time owner setup
+        </Link>
+      </div>
     </main>
   );
 }

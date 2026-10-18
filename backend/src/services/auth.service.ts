@@ -70,6 +70,7 @@ export const getAdminSetupStatus = async () => {
 
   return {
     available: !admin && Boolean(env.ADMIN_SETUP_KEY),
+    setupKeyConfigured: Boolean(env.ADMIN_SETUP_KEY),
   };
 };
 

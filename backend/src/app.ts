@@ -84,7 +84,10 @@ const errorHandler: ErrorRequestHandler = (
 
   if (
     err instanceof Error &&
-    err.message === 'Email or username is already in use'
+    [
+      'Email or username is already in use',
+      'A user with that email or username already exists.',
+    ].includes(err.message)
   ) {
     res.status(409).json({
       success: false,
@@ -97,7 +100,6 @@ const errorHandler: ErrorRequestHandler = (
   if (
     err instanceof Error &&
     [
-      'A user with that email or username already exists.',
       'Admin setup has already been completed',
       'Account not found',
     ].includes(err.message)
