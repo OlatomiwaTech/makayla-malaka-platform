@@ -11,7 +11,7 @@ export function Hero({ latestVideoHref }: HeroProps) {
     <section className="relative isolate grid overflow-hidden rounded-[2rem] bg-[#fff3e4] shadow-[0_24px_80px_-48px_rgba(92,43,30,0.38)] ring-1 ring-[#8b4a35]/10 lg:min-h-[600px] lg:grid-cols-[1.08fr_0.92fr]">
       <div className="relative z-10 flex flex-col justify-between px-6 py-8 sm:px-10 sm:py-11 lg:px-14 lg:py-12">
         <div className="flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-full bg-[#f8d8bd] text-lg" aria-hidden="true">✳</span>
+          <span className="grid size-10 place-items-center rounded-full bg-[#f8d8bd] font-serif text-xl text-[#b64d60]" aria-hidden="true">✦</span>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8b4a35]/65">The official home of</p>
             <p className="mt-0.5 text-sm font-semibold text-[#542c28]">Makayla Malaka</p>
