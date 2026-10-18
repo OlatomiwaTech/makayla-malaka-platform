@@ -84,6 +84,7 @@ export default function NewVideoPage() {
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const lastAnalyzedUrl = useRef<string | null>(null);
+  const previewRequestId = useRef(0);
   const lastAutoTitle = useRef<string | null>(null);
   const lastAutoDescription = useRef<string | null>(null);
 
@@ -108,6 +109,7 @@ export default function NewVideoPage() {
       thumbnailUrl: '',
     },
   });
+  const youtubeUrlField = register('youtubeUrl');
 
   const analyzeUrl = async () => {
     const youtubeUrl = getValues('youtubeUrl').trim();
@@ -118,11 +120,14 @@ export default function NewVideoPage() {
     setPreviewError(null);
     setPreview(null);
     setServerError(null);
+    const requestId = ++previewRequestId.current;
 
     try {
       const result = await api<PreviewResponse>(
         `/videos/preview?url=${encodeURIComponent(youtubeUrl)}`,
       );
+      if (requestId !== previewRequestId.current) return;
+
       const metadata = result.data.video;
       const currentTitle = getValues('title').trim();
       const currentDescription = getValues('description')?.trim() ?? '';
@@ -139,6 +144,8 @@ export default function NewVideoPage() {
       lastAnalyzedUrl.current = youtubeUrl;
       setPreview(metadata);
     } catch (error) {
+      if (requestId !== previewRequestId.current) return;
+
       lastAnalyzedUrl.current = null;
       const message =
         typeof error === 'object' &&
@@ -151,7 +158,9 @@ export default function NewVideoPage() {
             : 'Could not analyze this YouTube video.';
       setPreviewError(message);
     } finally {
-      setIsAnalyzing(false);
+      if (requestId === previewRequestId.current) {
+        setIsAnalyzing(false);
+      }
     }
   };
 
@@ -237,8 +246,11 @@ export default function NewVideoPage() {
 
           <div className="mt-2 flex flex-col gap-2 sm:flex-row">
             <input
-              {...register('youtubeUrl')}
-              onBlur={() => void analyzeUrl()}
+              {...youtubeUrlField}
+              onBlur={(event) => {
+                youtubeUrlField.onBlur(event);
+                void analyzeUrl();
+              }}
               onPaste={() => {
                 window.setTimeout(() => void analyzeUrl(), 0);
               }}
