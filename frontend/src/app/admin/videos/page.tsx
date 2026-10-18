@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, ExternalLink, Search, Video } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Search, Trash2, Video } from 'lucide-react';
 
 import { api } from '@/lib/api';
 import type { Video as ManagedVideo } from '@/types/video';
@@ -18,6 +18,7 @@ type ManagedVideosResponse = {
 };
 
 type VideoResponse = { success: boolean; data: { video: ManagedVideo } };
+type DeleteResponse = { success: boolean; message: string };
 type Status = ManagedVideo['status'] | '';
 
 const statusOptions: Array<{ value: Status; label: string }> = [
@@ -81,6 +82,33 @@ export default function ManageVideosPage() {
             ? error.message
             : 'Unable to update this video.';
       setActionError(`Could not update “${video.title}”: ${message}`);
+    } finally {
+      setWorkingId(null);
+    }
+  };
+
+  const removeVideo = async (video: ManagedVideo) => {
+    const confirmed = window.confirm(
+      `Permanently delete “${video.title}”? This will remove it from the video catalogue and cannot be undone.`,
+    );
+    if (!confirmed) return;
+
+    setActionError(null);
+    setActionSuccess(null);
+    setWorkingId(video.id);
+    try {
+      await api<DeleteResponse>(`/videos/${video.id}`, { method: 'DELETE' });
+      setActionSuccess(`“${video.title}” was permanently deleted.`);
+      if (videos.length === 1 && page > 1) setPage((current) => current - 1);
+      await queryClient.invalidateQueries({ queryKey: ['managed-videos'] });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string'
+            ? error.message
+            : 'Unable to delete this video.';
+      setActionError(`Could not delete “${video.title}”: ${message}`);
     } finally {
       setWorkingId(null);
     }
@@ -160,6 +188,9 @@ export default function ManageVideosPage() {
               )}
               <button type="button" disabled={workingId === video.id} onClick={() => updateStatus(video, video.status === 'ARCHIVED' ? 'DRAFT' : 'ARCHIVED')} className="rounded-full border border-black/10 px-4 py-2.5 text-xs font-semibold hover:bg-black/[0.04] disabled:opacity-50">
                 {video.status === 'ARCHIVED' ? 'Restore draft' : 'Archive'}
+              </button>
+              <button type="button" disabled={workingId === video.id} onClick={() => removeVideo(video)} className="inline-flex items-center gap-1.5 rounded-full border border-red-200 px-3 py-2.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50" aria-label={`Permanently delete ${video.title}`}>
+                <Trash2 size={14} /> Delete
               </button>
               {video.status === 'PUBLISHED' && <Link href={`/videos/${video.id}`} target="_blank" aria-label={`Open ${video.title} public page`} className="grid size-9 place-items-center rounded-full border border-black/10 hover:bg-black/[0.04]"><ExternalLink size={14} /></Link>}
             </div>

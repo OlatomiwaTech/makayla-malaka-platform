@@ -6,6 +6,7 @@ import {
   list,
   listManaged,
   preview,
+  remove,
   update,
 } from '../videos/video.controller.js';
 
@@ -48,6 +49,13 @@ router.patch(
   requireAuth,
   requireRole('MEDIA_EDITOR', 'EDITOR', 'ADMIN'),
   asyncHandler(update),
+);
+
+router.delete(
+  '/:id',
+  requireAuth,
+  requireRole('MEDIA_EDITOR', 'EDITOR', 'ADMIN'),
+  asyncHandler(remove),
 );
 
 export default router;

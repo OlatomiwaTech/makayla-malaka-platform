@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { create, getOne, list, listManaged, preview, update, } from '../videos/video.controller.js';
+import { create, getOne, list, listManaged, preview, remove, update, } from '../videos/video.controller.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { requireRole } from '../middleware/role.middleware.js';
 import { asyncHandler } from '../middleware/async-handler.js';
@@ -10,5 +10,6 @@ router.get('/preview', requireAuth, requireRole('MEDIA_EDITOR', 'EDITOR', 'ADMIN
 router.get('/:id', asyncHandler(getOne));
 router.post('/', requireAuth, requireRole('MEDIA_EDITOR', 'EDITOR', 'ADMIN'), asyncHandler(create));
 router.patch('/:id', requireAuth, requireRole('MEDIA_EDITOR', 'EDITOR', 'ADMIN'), asyncHandler(update));
+router.delete('/:id', requireAuth, requireRole('MEDIA_EDITOR', 'EDITOR', 'ADMIN'), asyncHandler(remove));
 export default router;
 //# sourceMappingURL=video.routes.js.map

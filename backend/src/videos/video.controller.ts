@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 
 import {
   createVideo,
+  deleteVideo,
   getPublishedVideoById,
   getPublishedVideos,
   getManagedVideos,
@@ -61,6 +62,17 @@ export const update = async (
     success: true,
     data: { video },
   });
+};
+
+export const remove = async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  if (!id || Array.isArray(id)) {
+    return res.status(400).json({ success: false, message: 'Video id is required.' });
+  }
+
+  await deleteVideo(id);
+  res.status(200).json({ success: true, message: 'Video deleted.' });
 };
 
 export const list = async (

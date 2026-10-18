@@ -164,6 +164,19 @@ export const updateVideo = async (
   });
 };
 
+export const deleteVideo = async (videoId: string) => {
+  const existingVideo = await prisma.video.findUnique({
+    where: { id: videoId },
+    select: { id: true },
+  });
+
+  if (!existingVideo) {
+    throw new Error('Video not found');
+  }
+
+  return prisma.video.delete({ where: { id: videoId } });
+};
+
 export const getPublishedVideos = async (
   page: number,
   limit: number,
