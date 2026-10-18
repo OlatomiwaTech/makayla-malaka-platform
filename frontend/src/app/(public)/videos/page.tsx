@@ -4,6 +4,7 @@ import { Video as VideoIcon } from 'lucide-react';
 
 import { SectionHeader } from '@/components/home/section-header';
 import { VideoCard } from '@/components/videos/video-card';
+import { VideoChannelFallback } from '@/components/videos/video-channel-fallback';
 import { useVideos } from '@/hooks/use-videos';
 
 const categories = [
@@ -80,24 +81,12 @@ export default function VideosPage() {
             </div>
           )}
 
-          {isError && (
-            <div className="rounded-[26px] bg-red-50 p-6 text-sm text-red-700">
-              We couldn&apos;t load the videos.
-            </div>
-          )}
+          {isError && <VideoChannelFallback unavailable />}
 
           {!isLoading &&
             !isError &&
             !data?.data.videos.length && (
-              <div className="rounded-[30px] bg-white p-10 text-center">
-                <p className="font-medium">
-                  No videos yet.
-                </p>
-
-                <p className="mt-2 text-sm text-black/45">
-                  New videos will appear here.
-                </p>
-              </div>
+              <VideoChannelFallback />
             )}
 
           {!isLoading &&

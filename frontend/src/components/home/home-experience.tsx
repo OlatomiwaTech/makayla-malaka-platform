@@ -6,6 +6,8 @@ import { ArrowUpRight, Disc3, ExternalLink, Newspaper, Video as VideoIcon } from
 
 import { Hero } from '@/components/home/hero';
 import { SectionHeader } from '@/components/home/section-header';
+import { MusicPlatformFallback } from '@/components/music/music-platform-fallback';
+import { VideoChannelFallback } from '@/components/videos/video-channel-fallback';
 import { useMusic } from '@/hooks/use-music';
 import { usePosts } from '@/hooks/use-posts';
 import { useVideos } from '@/hooks/use-videos';
@@ -156,17 +158,9 @@ export function HomeExperience() {
         <section className="pt-16 sm:pt-20">
           <SectionHeader eyebrow="Listen" title="Music by Makayla" href="/music" />
           {musicQuery.isPending && <div className="h-64 animate-pulse rounded-3xl bg-[#f4e9dc]" aria-label="Loading music" />}
-          {musicQuery.isError && <SectionError>The music catalogue is temporarily unavailable. Please try again soon.</SectionError>}
+          {musicQuery.isError && <MusicPlatformFallback unavailable />}
           {!musicQuery.isPending && !musicQuery.isError && !featuredRelease && (
-            <div className="flex flex-col items-start gap-4 border-y border-black/10 py-9 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="font-medium">No music releases have been published yet.</p>
-                <p className="mt-2 text-sm text-black/55">Visit the catalogue to check back for new music.</p>
-              </div>
-              <Link href="/music" className="inline-flex min-h-11 items-center gap-2 bg-black px-4 py-3 text-sm font-semibold text-white hover:bg-[#c30c6c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ed1689]">
-                Explore music <ArrowUpRight size={15} />
-              </Link>
-            </div>
+            <MusicPlatformFallback />
           )}
           {!musicQuery.isPending && !musicQuery.isError && featuredRelease && (
             <div className="grid overflow-hidden rounded-3xl bg-[#633644] text-white shadow-[0_24px_70px_-40px_rgba(84,44,40,0.65)] md:grid-cols-[minmax(240px,0.8fr)_1.2fr]">
@@ -222,12 +216,9 @@ export function HomeExperience() {
             {[0, 1, 2].map((item) => <div key={item} className="aspect-video animate-pulse rounded-2xl bg-[#f4e9dc]" />)}
             </div>
           )}
-          {videosQuery.isError && <SectionError>Videos are temporarily unavailable. Please try again soon.</SectionError>}
+          {videosQuery.isError && <VideoChannelFallback unavailable />}
           {!videosQuery.isPending && !videosQuery.isError && videos.length === 0 && (
-            <div className="border-y border-black/10 py-9">
-              <p className="font-medium">No videos have been published yet.</p>
-              <p className="mt-2 text-sm text-black/55">New videos will appear here when available.</p>
-            </div>
+            <VideoChannelFallback />
           )}
           {!videosQuery.isPending && !videosQuery.isError && videos.length > 0 && (
             <div className="grid gap-x-5 gap-y-8 md:grid-cols-2 lg:grid-cols-3">

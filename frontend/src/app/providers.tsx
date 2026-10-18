@@ -20,7 +20,8 @@ export default function Providers({
 				defaultOptions: {
 					queries: {
 						staleTime: 30_000,
-						retry: 1,
+						retry: 4,
+						retryDelay: (attempt) => Math.min(500 * 2 ** attempt, 4_000),
 					},
 				},
 			}),

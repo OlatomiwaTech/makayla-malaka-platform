@@ -3,6 +3,7 @@
 import { Music2 } from 'lucide-react';
 
 import { ReleaseCard } from '@/components/music/release-card';
+import { MusicPlatformFallback } from '@/components/music/music-platform-fallback';
 import { SectionHeader } from '@/components/home/section-header';
 import {
   useFeaturedMusic,
@@ -125,24 +126,12 @@ export default function MusicPage() {
             </div>
           )}
 
-          {isError && (
-            <div className="rounded-[26px] border border-red-200 bg-red-50 p-6 text-sm text-red-700">
-              We couldn&apos;t load the music catalog.
-            </div>
-          )}
+          {isError && <MusicPlatformFallback unavailable />}
 
           {!isLoading &&
             !isError &&
             !data?.data.releases.length && (
-              <div className="rounded-[30px] bg-white p-10 text-center">
-                <p className="font-medium">
-                  No releases yet.
-                </p>
-
-                <p className="mt-2 text-sm text-black/45">
-                  New music will appear here.
-                </p>
-              </div>
+              <MusicPlatformFallback />
             )}
 
           {!isLoading &&
