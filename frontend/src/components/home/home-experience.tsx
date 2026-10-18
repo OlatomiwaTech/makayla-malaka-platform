@@ -8,7 +8,7 @@ import { Hero } from '@/components/home/hero';
 import { SectionHeader } from '@/components/home/section-header';
 import { MusicPlatformFallback } from '@/components/music/music-platform-fallback';
 import { VideoChannelFallback } from '@/components/videos/video-channel-fallback';
-import { useFeaturedMusic, useMusic } from '@/hooks/use-music';
+import { useMusic } from '@/hooks/use-music';
 import { usePosts } from '@/hooks/use-posts';
 import { useVideos } from '@/hooks/use-videos';
 
@@ -36,65 +36,91 @@ const dateLabel = (value: string) =>
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-    timeZone: 'UTC',
   }).format(new Date(value));
 
-function SectionError({ children, onRetry }: { children: string; onRetry: () => void }) {
+function SectionError({ children }: { children: string }) {
   return (
-    <div role="alert" className="flex flex-wrap items-center justify-between gap-3 border-l-2 border-[#ed1689] bg-[#f8f5f7] px-4 py-4 text-sm text-[#222]">
-      <p>{children}</p>
-      <button type="button" onClick={onRetry} className="min-h-10 rounded-full border border-black/15 bg-white px-4 text-sm font-semibold transition hover:border-[#ed1689] hover:text-[#c30c6c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ed1689]">
-        Try again
-      </button>
-    </div>
+    <p role="alert" className="border-l-2 border-red-600 bg-red-50 px-4 py-3 text-sm text-red-800">
+      {children}
+    </p>
   );
 }
 
 export function HomeExperience() {
   const postsQuery = usePosts();
   const musicQuery = useMusic();
-  const featuredMusicQuery = useFeaturedMusic();
   const videosQuery = useVideos();
 
   const posts = postsQuery.data?.data.posts.slice(0, 3) ?? [];
   const releases = musicQuery.data?.data.releases ?? [];
-  const featuredRelease = featuredMusicQuery.data?.data.release ??
-    (!featuredMusicQuery.isPending ? releases[0] : undefined);
+  const featuredRelease = releases.find((release) => release.isFeatured) ?? releases[0];
   const videos = videosQuery.data?.data.videos.slice(0, 3) ?? [];
-  const musicPending = !featuredRelease && (musicQuery.isPending || featuredMusicQuery.isPending);
-  const musicUnavailable = !featuredRelease && (musicQuery.isError || featuredMusicQuery.isError);
 
   return (
-    <div className="bg-white text-[#111]">
+    <div className="bg-[#fffaf3]">
       <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <Hero latestVideoHref={videos[0] ? `/videos/${videos[0].id}` : undefined} />
 
-        <section id="latest-updates" className="scroll-mt-28 border-t border-black/10 pt-14 sm:pt-20">
-          <SectionHeader eyebrow="The latest" title="Notes from Makayla" tone="brand" />
+        <section aria-label="Makayla at a glance" className="mt-5 grid grid-cols-3 divide-x divide-[#8b4a35]/15 rounded-2xl border border-[#8b4a35]/10 bg-white/70 px-2 py-5 shadow-sm sm:mt-7 sm:px-8 sm:py-6">
+          <div className="px-2 text-center sm:px-4"><p className="font-serif text-2xl text-[#765033] sm:text-3xl">6</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[0.13em] text-[#654b44]/65 sm:text-[10px] sm:tracking-[0.18em]">Albums</p></div>
+          <div className="px-2 text-center sm:px-4"><p className="font-serif text-2xl text-[#765033] sm:text-3xl">7</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[0.13em] text-[#654b44]/65 sm:text-[10px] sm:tracking-[0.18em]">First single at</p></div>
+          <div className="px-2 text-center sm:px-4"><p className="font-serif text-2xl text-[#765033] sm:text-3xl">∞</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[0.13em] text-[#654b44]/65 sm:text-[10px] sm:tracking-[0.18em]">Big dreams</p></div>
+        </section>
+
+        <section aria-label="Makayla performing live" className="relative mt-8 isolate flex min-h-[300px] items-end overflow-hidden rounded-3xl bg-[#321c32] shadow-[0_24px_70px_-40px_rgba(84,44,40,0.6)] sm:mt-10 sm:min-h-[370px]">
+          <Image
+            src="/makayla-perform.avif"
+            alt="Makayla performing onstage for a crowd"
+            fill
+            sizes="(max-width: 768px) 100vw, 90vw"
+            className="-z-20 object-cover object-[center_42%]"
+          />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#241323]/95 via-[#241323]/65 to-[#241323]/10" />
+          <div className="absolute bottom-7 right-8 z-10 hidden h-28 w-48 overflow-hidden rounded-2xl border-4 border-[#fff3e4]/90 shadow-xl lg:block">
+            <Image
+              src="/makayla-performance.jpeg"
+              alt="Makayla performing beneath pink stage lights"
+              fill
+              sizes="192px"
+              className="object-cover"
+            />
+          </div>
+          <div className="max-w-xl px-6 py-8 text-white sm:px-10 sm:py-10">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#f8d16e]">Feel the moment</p>
+            <h2 className="mt-3 font-serif text-3xl leading-tight tracking-[-0.03em] sm:text-4xl">Good music brings us together.</h2>
+            <p className="mt-3 max-w-md text-sm leading-6 text-white/75">Step into the crowd, catch the energy, and enjoy Makayla doing what she loves.</p>
+            <Link href="/videos" className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#fff3e4] px-5 py-3 text-sm font-semibold text-[#542c28] transition hover:bg-[#f8d16e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
+              Explore videos <ArrowUpRight size={15} />
+            </Link>
+          </div>
+        </section>
+
+        <section id="latest-updates" className="scroll-mt-28 pt-16 sm:pt-20">
+          <SectionHeader eyebrow="The latest" title="Notes from Makayla" />
           {postsQuery.isPending && (
-            <div className="grid gap-x-6 gap-y-8 md:grid-cols-3" aria-label="Loading updates" aria-busy="true">
+            <div className="grid gap-5 md:grid-cols-3" aria-label="Loading updates">
               {[0, 1, 2].map((item) => (
-                <div key={item} className="aspect-[4/3] animate-pulse bg-black/5" />
+              <div key={item} className="h-64 animate-pulse rounded-3xl bg-[#f4e9dc]" />
               ))}
             </div>
           )}
           {postsQuery.isError && (
-            <SectionError onRetry={() => { void postsQuery.refetch(); }}>Latest updates are temporarily unavailable.</SectionError>
+            <SectionError>Latest updates are temporarily unavailable. Please try again soon.</SectionError>
           )}
           {!postsQuery.isPending && !postsQuery.isError && posts.length === 0 && (
-            <div className="border-y border-black/10 py-8">
+            <div className="border-y border-black/10 py-9">
               <p className="font-medium">No updates have been published yet.</p>
               <p className="mt-2 text-sm text-black/55">Check back for news and announcements from Makayla.</p>
             </div>
           )}
           {!postsQuery.isPending && !postsQuery.isError && posts.length > 0 && (
-            <div className="grid gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-x-5 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
               {posts.map((post) => (
-                <article key={post.id} className="group flex h-full flex-col">
+                <article key={post.id} className="group flex h-full flex-col rounded-3xl border border-[#8b4a35]/10 bg-white p-3 shadow-[0_12px_40px_-32px_rgba(84,44,40,0.5)] transition hover:-translate-y-1">
                   <Link
                     href={`/posts/${post.id}`}
                     aria-label={`Read ${post.title || 'Makayla’s latest update'}`}
-                    className="relative mb-4 grid aspect-[4/3] place-items-center overflow-hidden rounded-xl bg-[#f0edf0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ed1689]"
+                    className="relative mb-4 grid aspect-[4/3] place-items-center overflow-hidden rounded-2xl bg-[#f4e9dc] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#b77a35]"
                   >
                     {post.imageUrl ? (
                       <Image
@@ -106,20 +132,20 @@ export function HomeExperience() {
                         className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                       />
                     ) : (
-                      <Newspaper size={32} strokeWidth={1.2} className="text-[#ed1689]" aria-hidden="true" />
+                      <Newspaper size={32} strokeWidth={1.2} className="text-[#b77a35]" aria-hidden="true" />
                     )}
                   </Link>
-                  <div className="flex flex-1 flex-col">
-                    <time dateTime={post.publishedAt ?? post.createdAt} className="text-xs font-medium uppercase tracking-[0.14em] text-black/50">
+                  <div className="flex flex-1 flex-col px-2 pb-2">
+                    <time dateTime={post.publishedAt ?? post.createdAt} className="text-xs font-medium uppercase tracking-[0.14em] text-black/45">
                       {dateLabel(post.publishedAt ?? post.createdAt)}
                     </time>
                     <h3 className="mt-2 text-xl font-semibold leading-snug tracking-[-0.025em]">
-                      <Link href={`/posts/${post.id}`} className="transition-colors hover:text-[#c30c6c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ed1689]">
+                      <Link href={`/posts/${post.id}`} className="transition-colors hover:text-[#8a5b2d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b77a35]">
                         {post.title || 'Latest update'}
                       </Link>
                     </h3>
-                    <p className="mt-3 line-clamp-3 text-sm leading-6 text-black/65">{post.content}</p>
-                    <Link href={`/posts/${post.id}`} className="mt-5 inline-flex w-fit items-center gap-2 text-sm font-semibold text-[#111] hover:text-[#c30c6c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ed1689]">
+                    <p className="mt-3 line-clamp-3 text-sm leading-6 text-black/60">{post.content}</p>
+                    <Link href={`/posts/${post.id}`} className="mt-5 inline-flex w-fit items-center gap-2 text-sm font-semibold hover:text-[#8a5b2d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#b77a35]">
                       Read update <ArrowUpRight size={15} />
                     </Link>
                   </div>
@@ -129,21 +155,16 @@ export function HomeExperience() {
           )}
         </section>
 
-        <section className="border-t border-black/10 pt-14 sm:pt-20">
-          <SectionHeader eyebrow="Listen" title="Music by Makayla" href="/music" tone="brand" />
-          {musicPending && <div className="h-64 animate-pulse bg-black/5" aria-label="Loading music" aria-busy="true" />}
-          {musicUnavailable && (
-            <>
-              <SectionError onRetry={() => { void Promise.all([musicQuery.refetch(), featuredMusicQuery.refetch()]); }}>The music spotlight is temporarily unavailable.</SectionError>
-              <div className="mt-5"><MusicPlatformFallback unavailable brand /></div>
-            </>
+        <section className="pt-16 sm:pt-20">
+          <SectionHeader eyebrow="Listen" title="Music by Makayla" href="/music" />
+          {musicQuery.isPending && <div className="h-64 animate-pulse rounded-3xl bg-[#f4e9dc]" aria-label="Loading music" />}
+          {musicQuery.isError && <MusicPlatformFallback unavailable />}
+          {!musicQuery.isPending && !musicQuery.isError && !featuredRelease && (
+            <MusicPlatformFallback />
           )}
-          {!musicPending && !musicUnavailable && !featuredRelease && (
-            <MusicPlatformFallback brand />
-          )}
-          {!musicPending && !musicUnavailable && featuredRelease && (
-            <div className="grid overflow-hidden rounded-2xl bg-[#0b0b0d] text-white md:grid-cols-[minmax(240px,0.8fr)_1.2fr]">
-              <Link href={`/music/${featuredRelease.id}`} aria-label={`View ${featuredRelease.title} release details`} className="relative block aspect-square bg-[#19171a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#ed1689]">
+          {!musicQuery.isPending && !musicQuery.isError && featuredRelease && (
+            <div className="grid overflow-hidden rounded-3xl bg-[#633644] text-white shadow-[0_24px_70px_-40px_rgba(84,44,40,0.65)] md:grid-cols-[minmax(240px,0.8fr)_1.2fr]">
+              <Link href={`/music/${featuredRelease.id}`} className="relative block aspect-square bg-[#e9c1a6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#b77a35]">
                 {featuredRelease.coverUrl ? (
                   <Image
                     src={featuredRelease.coverUrl}
@@ -155,31 +176,31 @@ export function HomeExperience() {
                   />
                 ) : (
                   <div className="grid size-full place-items-center" aria-label="No release artwork">
-                    <Disc3 size={60} strokeWidth={1} className="text-[#ed1689]" aria-hidden="true" />
+                    <Disc3 size={60} strokeWidth={1} className="text-white/45" aria-hidden="true" />
                   </div>
                 )}
               </Link>
               <div className="flex flex-col justify-between p-6 sm:p-9 lg:p-12">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff71bb]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ffd18a]">
                     {featuredRelease.isFeatured ? 'Featured release' : 'Latest release'} · {featuredRelease.type}
                   </p>
                   <h3 className="mt-4 text-3xl font-semibold tracking-[-0.045em] sm:text-4xl">
-                    <Link href={`/music/${featuredRelease.id}`} className="font-serif hover:text-[#ff71bb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff71bb]">
+                    <Link href={`/music/${featuredRelease.id}`} className="font-serif hover:text-[#ffd18a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ffd18a]">
                       {featuredRelease.title}
                     </Link>
                   </h3>
-                  <p className="mt-2 text-sm text-white/75">{featuredRelease.artistName}</p>
-                  <time dateTime={featuredRelease.releaseDate} className="mt-4 block text-sm text-white/60">{dateLabel(featuredRelease.releaseDate)}</time>
-                  {featuredRelease.description && <p className="mt-5 max-w-xl text-sm leading-6 text-white/70">{featuredRelease.description}</p>}
+                  <p className="mt-2 text-sm text-white/65">{featuredRelease.artistName}</p>
+                  <p className="mt-4 text-sm text-white/50">{dateLabel(featuredRelease.releaseDate)}</p>
+                  {featuredRelease.description && <p className="mt-5 max-w-xl text-sm leading-6 text-white/65">{featuredRelease.description}</p>}
                 </div>
                 <div className="mt-8 flex flex-wrap gap-2">
                   {featuredRelease.links.map((link) => (
-                    <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/35 px-4 py-2 text-sm font-semibold transition-colors hover:border-[#ff71bb] hover:text-[#ff71bb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff71bb]">
+                    <a key={link.id} href={link.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 border border-white/30 px-4 py-2 text-sm font-semibold transition-colors hover:border-[#e0b36d] hover:text-[#e0b36d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e0b36d]">
                       Listen on {link.platform} <ExternalLink size={14} />
                     </a>
                   ))}
-                  <Link href={`/music/${featuredRelease.id}`} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#ed1689] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#c30c6c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff71bb]">
+                  <Link href={`/music/${featuredRelease.id}`} className="inline-flex min-h-11 items-center gap-2 bg-[#b77a35] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#8a5b2d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e0b36d]">
                     Release details <ArrowUpRight size={15} />
                   </Link>
                 </div>
@@ -188,27 +209,22 @@ export function HomeExperience() {
           )}
         </section>
 
-        <section className="border-t border-black/10 pt-14 sm:pt-20">
-          <SectionHeader eyebrow="Watch" title="Latest videos" href="/videos" tone="brand" />
+        <section className="pt-16 sm:pt-20">
+          <SectionHeader eyebrow="Watch" title="Latest videos" href="/videos" />
           {videosQuery.isPending && (
-            <div className="grid gap-6 md:grid-cols-3" aria-label="Loading videos" aria-busy="true">
-              {[0, 1, 2].map((item) => <div key={item} className="aspect-video animate-pulse rounded-xl bg-black/5" />)}
+            <div className="grid gap-6 md:grid-cols-3" aria-label="Loading videos">
+            {[0, 1, 2].map((item) => <div key={item} className="aspect-video animate-pulse rounded-2xl bg-[#f4e9dc]" />)}
             </div>
           )}
-          {videosQuery.isError && (
-            <>
-              <SectionError onRetry={() => { void videosQuery.refetch(); }}>Videos are temporarily unavailable.</SectionError>
-              <div className="mt-5"><VideoChannelFallback unavailable brand /></div>
-            </>
-          )}
+          {videosQuery.isError && <VideoChannelFallback unavailable />}
           {!videosQuery.isPending && !videosQuery.isError && videos.length === 0 && (
-            <VideoChannelFallback brand />
+            <VideoChannelFallback />
           )}
           {!videosQuery.isPending && !videosQuery.isError && videos.length > 0 && (
             <div className="grid gap-x-5 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
               {videos.map((video) => (
-                <Link key={video.id} href={`/videos/${video.id}`} aria-label={`Watch ${video.title}`} className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ed1689]">
-                  <div className="relative aspect-video overflow-hidden rounded-xl bg-[#111]">
+                <Link key={video.id} href={`/videos/${video.id}`} className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#b77a35]">
+                  <div className="relative aspect-video overflow-hidden rounded-2xl bg-[#633644]">
                     {video.thumbnailUrl ? (
                       <Image
                         src={video.thumbnailUrl}
@@ -221,25 +237,25 @@ export function HomeExperience() {
                     ) : (
                       <div className="grid size-full place-items-center"><VideoIcon size={32} className="text-white/60" aria-hidden="true" /></div>
                     )}
-                    <span className="absolute bottom-3 left-3 rounded-full bg-black/85 px-3 py-1 text-xs font-semibold text-white">{video.category}</span>
+                    <span className="absolute bottom-3 left-3 bg-black/80 px-3 py-1 text-xs font-semibold text-white">{video.category}</span>
                   </div>
-                  <h3 className="mt-4 font-semibold leading-snug tracking-[-0.02em] group-hover:text-[#c30c6c]">{video.title}</h3>
-                  {video.publishedAt && <time dateTime={video.publishedAt} className="mt-2 block text-xs text-black/55">{dateLabel(video.publishedAt)}</time>}
+                  <h3 className="mt-4 font-semibold leading-snug tracking-[-0.02em] group-hover:text-[#8a5b2d]">{video.title}</h3>
+                  {video.publishedAt && <time dateTime={video.publishedAt} className="mt-2 block text-xs text-black/45">{dateLabel(video.publishedAt)}</time>}
                 </Link>
               ))}
             </div>
           )}
         </section>
 
-        <section className="mt-14 border-t border-black/10 py-10 sm:mt-20 sm:py-12">
+        <section className="mt-16 rounded-3xl bg-[#f3dfce] px-6 py-8 sm:mt-20 sm:px-10 sm:py-10">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c30c6c]">Stay connected</p>
-              <h2 className="mt-2 font-serif text-2xl font-medium tracking-[-0.035em] text-[#111] sm:text-3xl">Come be part of the fun.</h2>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#765033]">Stay connected</p>
+              <h2 className="mt-2 font-serif text-2xl font-medium tracking-[-0.035em] text-[#542c28] sm:text-3xl">Come be part of the fun.</h2>
             </div>
             <div className="flex flex-wrap gap-3">
               {socialLinks.map((link) => (
-                <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-black/15 bg-white px-4 py-2 text-sm font-semibold transition-colors hover:border-[#ed1689] hover:text-[#c30c6c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ed1689]">
+                <a key={link.href} href={link.href} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 border border-black/15 bg-white px-4 py-2 text-sm font-semibold transition-colors hover:border-[#b77a35] hover:text-[#8a5b2d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b77a35]">
                   {link.label}
                   <ExternalLink size={13} aria-hidden="true" />
                 </a>
