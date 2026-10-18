@@ -1,5 +1,7 @@
 import { prisma } from '../lib/prisma.js';
 import { comparePassword, hashPassword, signToken } from '../lib/auth.js';
+import { env } from '../config/env.js';
+import type { BootstrapAdminSchema } from '../schemas/auth.schema.js';
 import type { AuthResponse, AuthUser, LoginInput, RegisterInput } from '../types/auth.js';
 
 const toAuthUser = (user: {
@@ -58,6 +60,85 @@ export const registerUser = async (input: RegisterInput): Promise<AuthResponse> 
     user: toAuthUser(user),
     token,
   };
+};
+
+export const getAdminSetupStatus = async () => {
+  const admin = await prisma.user.findFirst({
+    where: { role: 'ADMIN' },
+    select: { id: true },
+  });
+
+  return {
+    available: !admin && Boolean(env.ADMIN_SETUP_KEY),
+  };
+};
+
+export const bootstrapAdmin = async (
+  input: BootstrapAdminSchema,
+): Promise<AuthResponse> => {
+  const configuredKey = env.ADMIN_SETUP_KEY;
+
+  if (!configuredKey) {
+    throw new Error('Admin setup is not configured');
+  }
+
+  if (input.setupKey !== configuredKey) {
+    throw new Error('Invalid admin setup key');
+  }
+
+  const email = input.email.trim().toLowerCase();
+  const username = input.username.trim();
+
+  try {
+    const user = await prisma.$transaction(
+      async (tx) => {
+        const existingAdmin = await tx.user.findFirst({
+          where: { role: 'ADMIN' },
+          select: { id: true },
+        });
+
+        if (existingAdmin) {
+          throw new Error('Admin setup has already been completed');
+        }
+
+        return tx.user.create({
+          data: {
+            email,
+            username,
+            passwordHash: await hashPassword(input.password),
+            role: 'ADMIN',
+            profile: {
+              create: {
+                displayName: input.displayName?.trim() || username,
+                bio: input.bio?.trim() || null,
+              },
+            },
+          },
+        });
+      },
+      { isolationLevel: 'Serializable' },
+    );
+
+    const token = signToken({
+      sub: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+    });
+
+    return { user: toAuthUser(user), token };
+  } catch (error) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      error.code === 'P2034'
+    ) {
+      throw new Error('Admin setup has already been completed');
+    }
+
+    throw error;
+  }
 };
 
 export const loginUser = async (input: LoginInput): Promise<AuthResponse> => {

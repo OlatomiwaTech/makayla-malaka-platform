@@ -24,5 +24,10 @@ export const loginSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters long.').max(128),
 });
 
+export const bootstrapAdminSchema = registerSchema.extend({
+  setupKey: z.string().min(1, 'Setup key is required.'),
+});
+
 export type RegisterSchema = z.infer<typeof registerSchema>;
 export type LoginSchema = z.infer<typeof loginSchema>;
+export type BootstrapAdminSchema = z.infer<typeof bootstrapAdminSchema>;

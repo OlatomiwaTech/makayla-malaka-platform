@@ -18,6 +18,11 @@ const envSchema = z.object({
   JWT_SECRET: z
     .string()
     .min(32, 'JWT_SECRET must be at least 32 characters'),
+
+  ADMIN_SETUP_KEY: z
+    .string()
+    .min(32, 'ADMIN_SETUP_KEY must be at least 32 characters')
+    .optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
