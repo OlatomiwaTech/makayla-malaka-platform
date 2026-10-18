@@ -68,7 +68,7 @@ export const updateRelease = async (
 		throw new Error('Music release not found');
 	}
 
-	return prisma.$transaction(async (tx) => {
+	return prisma.$transaction(async (tx: typeof prisma) => {
 		await tx.musicRelease.update({
 			where: {
 				id: releaseId,
