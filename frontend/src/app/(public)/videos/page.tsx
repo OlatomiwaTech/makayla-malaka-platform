@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Video as VideoIcon } from 'lucide-react';
 
 import { SectionHeader } from '@/components/home/section-header';
@@ -17,11 +18,15 @@ const categories = [
 ];
 
 export default function VideosPage() {
+  const [activeCategory, setActiveCategory] = useState('All');
   const {
     data,
     isLoading,
     isError,
-  } = useVideos();
+  } = useVideos(
+    1,
+    activeCategory === 'All' ? undefined : activeCategory,
+  );
 
   return (
     <div className="bg-[#f7f5f1]">
@@ -51,10 +56,12 @@ export default function VideosPage() {
             <button
               key={category}
               type="button"
-              className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium ${
-                category === 'All'
-                  ? 'bg-black text-white'
-                  : 'border border-black/10 bg-white text-black/55'
+              aria-pressed={activeCategory === category}
+              onClick={() => setActiveCategory(category)}
+              className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a3443d] ${
+                activeCategory === category
+                  ? 'bg-[#a3443d] text-white'
+                  : 'border border-black/10 bg-white text-black/55 hover:border-[#a3443d]/40 hover:text-[#a3443d]'
               }`}
             >
               {category}
@@ -85,8 +92,26 @@ export default function VideosPage() {
 
           {!isLoading &&
             !isError &&
-            !data?.data.videos.length && (
+            !data?.data.videos.length &&
+            activeCategory === 'All' && (
               <VideoChannelFallback />
+            )}
+
+          {!isLoading &&
+            !isError &&
+            !data?.data.videos.length &&
+            activeCategory !== 'All' && (
+              <div className="rounded-[26px] border border-black/5 bg-white px-6 py-12 text-center">
+                <p className="text-lg font-semibold">No {activeCategory.toLowerCase()} yet</p>
+                <p className="mt-2 text-sm text-black/50">Check back soon, or browse all of Makayla’s videos.</p>
+                <button
+                  type="button"
+                  onClick={() => setActiveCategory('All')}
+                  className="mt-5 rounded-full bg-[#a3443d] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#873832] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a3443d]"
+                >
+                  Show all videos
+                </button>
+              </div>
             )}
 
           {!isLoading &&
