@@ -71,6 +71,7 @@ export const list = async (
 	const result = await getPublishedReleases(
 		query.page,
 		query.limit,
+		query.type,
 	);
 
 	res.status(200).json({

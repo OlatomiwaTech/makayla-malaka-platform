@@ -105,12 +105,12 @@ export const deletePost = async (postId, authorId) => {
 };
 export const getPublishedPosts = async (page, limit) => {
     const skip = (page - 1) * limit;
-    const [posts, total] = await prisma.$transaction([
+    const [posts, total] = await Promise.all([
         prisma.post.findMany({
             where: {
                 status: 'PUBLISHED',
                 publishedAt: {
-                    not: null,
+                    lte: new Date(),
                 },
             },
             orderBy: {
@@ -136,7 +136,7 @@ export const getPublishedPosts = async (page, limit) => {
             where: {
                 status: 'PUBLISHED',
                 publishedAt: {
-                    not: null,
+                    lte: new Date(),
                 },
             },
         }),
@@ -158,7 +158,7 @@ export const getPublishedPostById = async (postId) => {
             id: postId,
             status: 'PUBLISHED',
             publishedAt: {
-                not: null,
+                lte: new Date(),
             },
         },
         include: {

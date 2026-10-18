@@ -1,6 +1,9 @@
 'use client';
 
-import { Music2 } from 'lucide-react';
+import { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ChevronLeft, ChevronRight, Music2 } from 'lucide-react';
 
 import { ReleaseCard } from '@/components/music/release-card';
 import { MusicPlatformFallback } from '@/components/music/music-platform-fallback';
@@ -9,13 +12,32 @@ import {
   useFeaturedMusic,
   useMusic,
 } from '@/hooks/use-music';
+import type { ReleaseType } from '@/types/music';
+
+const releaseFilters: Array<{ label: string; value?: ReleaseType }> = [
+  { label: 'All releases' },
+  { label: 'Singles', value: 'SINGLE' },
+  { label: 'EPs', value: 'EP' },
+  { label: 'Albums', value: 'ALBUM' },
+];
+
+const releaseDateLabel = (value: string) =>
+  new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(value));
 
 export default function MusicPage() {
+  const [page, setPage] = useState(1);
+  const [activeType, setActiveType] = useState<ReleaseType | undefined>();
   const {
     data,
     isLoading,
     isError,
-  } = useMusic();
+    refetch,
+  } = useMusic(page, activeType);
 
   const {
     data: featuredData,
@@ -23,6 +45,10 @@ export default function MusicPage() {
 
   const featured =
     featuredData?.data.release;
+  const visibleFeatured = featured && (!activeType || featured.type === activeType)
+    ? featured
+    : null;
+  const pagination = data?.data.pagination;
 
   return (
     <div className="bg-[#f7f5f1]">
@@ -47,7 +73,7 @@ export default function MusicPage() {
           </p>
         </section>
 
-        {featured && (
+        {visibleFeatured && (
           <section className="mb-20">
             <SectionHeader
               eyebrow="Featured"
@@ -56,11 +82,15 @@ export default function MusicPage() {
 
             <div className="grid overflow-hidden rounded-[30px] bg-[#171717] text-white lg:grid-cols-[0.8fr_1.2fr]">
               <div className="aspect-square bg-[#252525] lg:aspect-auto">
-                {featured.coverUrl ? (
-                  <img
-                    src={featured.coverUrl}
-                    alt={`${featured.title} cover`}
-                    className="h-full w-full object-cover"
+                {visibleFeatured.coverUrl ? (
+                  <Image
+                    src={visibleFeatured.coverUrl}
+                    alt={`${visibleFeatured.title} cover artwork`}
+                    fill
+                    unoptimized
+                    fetchPriority="high"
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="object-cover"
                   />
                 ) : (
                   <div className="grid h-full min-h-[360px] place-items-center">
@@ -74,23 +104,26 @@ export default function MusicPage() {
               <div className="flex flex-col justify-between p-7 sm:p-10 lg:p-14">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/35">
-                    {featured.type}
+                    {visibleFeatured.type}
                   </p>
 
                   <h2 className="mt-4 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
-                    {featured.title}
+                    {visibleFeatured.title}
                   </h2>
-                  <p className="mt-2 text-sm text-white/50">{featured.artistName}</p>
+                  <p className="mt-2 text-sm text-white/50">{visibleFeatured.artistName}</p>
+                  <time className="mt-2 block text-sm text-white/40" dateTime={visibleFeatured.releaseDate}>
+                    Released {releaseDateLabel(visibleFeatured.releaseDate)}
+                  </time>
 
-                  {featured.description && (
+                  {visibleFeatured.description && (
                     <p className="mt-5 max-w-xl text-sm leading-6 text-white/50">
-                      {featured.description}
+                      {visibleFeatured.description}
                     </p>
                   )}
                 </div>
 
                 <div className="mt-10 flex flex-wrap gap-2">
-                  {featured.links.map((link) => (
+                  {visibleFeatured.links.map((link) => (
                     <a
                       key={link.id}
                       href={link.url}
@@ -101,6 +134,12 @@ export default function MusicPage() {
                       Listen on {link.platform}
                     </a>
                   ))}
+                  <Link
+                    href={`/music/${visibleFeatured.id}`}
+                    className="rounded-full border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  >
+                    Release details
+                  </Link>
                 </div>
               </div>
             </div>
@@ -112,6 +151,38 @@ export default function MusicPage() {
             eyebrow="Catalog"
             title="All releases"
           />
+
+          <div className="mb-7 flex flex-wrap gap-2" role="group" aria-label="Filter releases by type">
+            {releaseFilters.map((filter) => {
+              const selected = activeType === filter.value;
+
+              return (
+                <button
+                  key={filter.label}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => {
+                    setPage(1);
+                    setActiveType(filter.value);
+                  }}
+                  className={`min-h-10 rounded-full px-4 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a3443d] ${
+                    selected
+                      ? 'bg-[#8d344b] text-white'
+                      : 'border border-[#8b4a35]/15 bg-white text-[#654b44]/75 hover:border-[#8d344b]/40 hover:text-[#8d344b]'
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {pagination && !isError && !isLoading && (
+            <p className="mb-5 text-sm text-[#654b44]/60" aria-live="polite">
+              {pagination.total} {pagination.total === 1 ? 'release' : 'releases'}
+              {activeType ? ` · ${releaseFilters.find((filter) => filter.value === activeType)?.label}` : ''}
+            </p>
+          )}
 
           {isLoading && (
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -126,13 +197,29 @@ export default function MusicPage() {
             </div>
           )}
 
-          {isError && <MusicPlatformFallback unavailable />}
+          {isError && (
+            <div role="alert" className="rounded-3xl border border-red-900/10 bg-white p-6 sm:p-8">
+              <h3 className="font-serif text-2xl text-[#542c28]">The catalogue couldn&apos;t load</h3>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-[#654b44]/70">Please try again in a moment. Makayla&apos;s official artist pages are also available below.</p>
+              <button type="button" onClick={() => void refetch()} className="mt-5 min-h-11 rounded-full bg-[#8d344b] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#74283d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d344b]">Try again</button>
+              <div className="mt-5"><MusicPlatformFallback unavailable /></div>
+            </div>
+          )}
 
           {!isLoading &&
             !isError &&
-            !data?.data.releases.length && (
+            !data?.data.releases.length &&
+            !activeType && (
               <MusicPlatformFallback />
             )}
+
+          {!isLoading && !isError && !data?.data.releases.length && activeType && (
+            <div className="rounded-[26px] border border-[#8b4a35]/10 bg-white px-6 py-10 text-center">
+              <h3 className="font-serif text-2xl text-[#542c28]">No {activeType === 'SINGLE' ? 'singles' : activeType === 'EP' ? 'EPs' : 'albums'} here yet</h3>
+              <p className="mt-2 text-sm text-[#654b44]/65">Try another release type or browse the complete catalogue.</p>
+              <button type="button" onClick={() => { setPage(1); setActiveType(undefined); }} className="mt-5 min-h-11 rounded-full bg-[#8d344b] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#74283d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d344b]">Browse all releases</button>
+            </div>
+          )}
 
           {!isLoading &&
             !isError &&
@@ -148,6 +235,16 @@ export default function MusicPage() {
                 )}
               </div>
             ) : null}
+
+          {!isLoading && !isError && pagination && pagination.totalPages > 1 && (
+            <nav className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-[#8b4a35]/10 pt-5" aria-label="Music catalogue pages">
+              <p className="text-sm text-[#654b44]/65">Page {pagination.page} of {pagination.totalPages}</p>
+              <div className="flex gap-2">
+                <button type="button" disabled={page <= 1} onClick={() => setPage((current) => current - 1)} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#8b4a35]/15 bg-white px-4 text-sm font-semibold text-[#542c28] transition hover:border-[#8d344b]/40 disabled:cursor-not-allowed disabled:opacity-40"><ChevronLeft size={16} aria-hidden="true" /> Previous</button>
+                <button type="button" disabled={!pagination.hasNextPage} onClick={() => setPage((current) => current + 1)} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#8b4a35]/15 bg-white px-4 text-sm font-semibold text-[#542c28] transition hover:border-[#8d344b]/40 disabled:cursor-not-allowed disabled:opacity-40">Next <ChevronRight size={16} aria-hidden="true" /></button>
+              </div>
+            </nav>
+          )}
         </section>
       </div>
     </div>

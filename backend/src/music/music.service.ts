@@ -166,11 +166,13 @@ export const updateRelease = async (
 export const getPublishedReleases = async (
 	page: number,
 	limit: number,
+	type?: 'SINGLE' | 'EP' | 'ALBUM',
 ) => {
 	const skip = (page - 1) * limit;
 
 	const where = {
 		status: 'PUBLISHED' as const,
+		...(type ? { type } : {}),
 		releaseDate: {
 			lte: new Date(),
 		},

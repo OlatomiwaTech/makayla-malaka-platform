@@ -29,7 +29,7 @@ export const update = async (req, res) => {
 };
 export const list = async (req, res) => {
     const query = musicListQuerySchema.parse(req.query);
-    const result = await getPublishedReleases(query.page, query.limit);
+    const result = await getPublishedReleases(query.page, query.limit, query.type);
     res.status(200).json({
         success: true,
         data: result,

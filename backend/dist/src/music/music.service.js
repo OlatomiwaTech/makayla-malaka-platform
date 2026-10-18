@@ -140,10 +140,11 @@ export const updateRelease = async (releaseId, input) => {
         });
     });
 };
-export const getPublishedReleases = async (page, limit) => {
+export const getPublishedReleases = async (page, limit, type) => {
     const skip = (page - 1) * limit;
     const where = {
         status: 'PUBLISHED',
+        ...(type ? { type } : {}),
         releaseDate: {
             lte: new Date(),
         },

@@ -129,6 +129,12 @@ export const musicListQuerySchema = z.object({
 		.min(1)
 		.max(50)
 		.default(12),
+
+	type: z.enum([
+		'SINGLE',
+		'EP',
+		'ALBUM',
+	]).optional(),
 });
 
 export const managedMusicListQuerySchema = musicListQuerySchema

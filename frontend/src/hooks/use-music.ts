@@ -4,16 +4,23 @@ import { api } from '@/lib/api';
 import type {
   FeaturedMusicResponse,
   MusicResponse,
+  ReleaseType,
 } from '@/types/music';
 
-export const useMusic = (page = 1) => {
+export const useMusic = (page = 1, type?: ReleaseType) => {
   return useQuery({
-    queryKey: ['music', page],
+    queryKey: ['music', page, type],
 
-    queryFn: () =>
-      api<MusicResponse>(
-        `/music?page=${page}&limit=12`,
-      ),
+    queryFn: () => {
+      const search = new URLSearchParams({
+        page: String(page),
+        limit: '12',
+      });
+
+      if (type) search.set('type', type);
+
+      return api<MusicResponse>(`/music?${search.toString()}`);
+    },
   });
 };
 
