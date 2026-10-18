@@ -170,7 +170,7 @@ const errorHandler: ErrorRequestHandler = (
   ) {
     res.status(502).json({
       success: false,
-      message: `${err.message}. Check the YouTube Data API key and quota, or try again later.`,
+      message: `${err.message}. The video may be unavailable, or the YouTube Data API key/quota may need attention.`,
     });
 
     return;
