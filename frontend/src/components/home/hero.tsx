@@ -42,7 +42,7 @@ export function Hero({ latestVideoHref }: HeroProps) {
         <div className="flex items-center gap-3 border-t border-[#8b4a35]/15 pt-5 text-xs font-medium text-[#654b44]/65">
           <span className="flex -space-x-2" aria-hidden="true">
             <span className="size-7 rounded-full border-2 border-[#fff3e4] bg-[#e7a969]" />
-            <span className="size-7 rounded-full border-2 border-[#fff3e4] bg-[#c77c70]" />
+            <span className="size-7 rounded-full border-2 border-[#fff3e4] bg-[#c18a45]" />
             <span className="size-7 rounded-full border-2 border-[#fff3e4] bg-[#98a889]" />
           </span>
           <span>For the fans, families & dreamers</span>
@@ -51,7 +51,7 @@ export function Hero({ latestVideoHref }: HeroProps) {
 
       <div className="relative order-1 min-h-[300px] overflow-hidden bg-[#e8b89a] sm:min-h-[400px] lg:order-2 lg:min-h-full">
         <div className="absolute -right-12 -top-14 size-64 rounded-full bg-[#f8d8bd]/75 sm:size-80" />
-        <div className="absolute -bottom-20 -left-12 size-64 rounded-full bg-[#d88c7c]/45 sm:size-80" />
+        <div className="absolute -bottom-20 -left-12 size-64 rounded-full bg-[#c99a65]/45 sm:size-80" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_25%,rgba(255,255,255,0.42),transparent_34%)]" />
         <Image
           src="/makyla.png"

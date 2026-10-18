@@ -163,7 +163,7 @@ export function HomeExperience() {
             <MusicPlatformFallback />
           )}
           {!musicQuery.isPending && !musicQuery.isError && featuredRelease && (
-            <div className="grid overflow-hidden rounded-3xl bg-[#633644] text-white shadow-[0_24px_70px_-40px_rgba(84,44,40,0.65)] md:grid-cols-[minmax(240px,0.8fr)_1.2fr]">
+            <div className="grid overflow-hidden rounded-3xl bg-[#4e493a] text-white shadow-[0_24px_70px_-40px_rgba(84,44,40,0.65)] md:grid-cols-[minmax(240px,0.8fr)_1.2fr]">
               <Link href={`/music/${featuredRelease.id}`} className="relative block aspect-square bg-[#e9c1a6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#b77a35]">
                 {featuredRelease.coverUrl ? (
                   <Image
@@ -224,7 +224,7 @@ export function HomeExperience() {
             <div className="grid gap-x-5 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
               {videos.map((video) => (
                 <Link key={video.id} href={`/videos/${video.id}`} className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#b77a35]">
-                  <div className="relative aspect-video overflow-hidden rounded-2xl bg-[#633644]">
+                  <div className="relative aspect-video overflow-hidden rounded-2xl bg-[#4e493a]">
                     {video.thumbnailUrl ? (
                       <Image
                         src={video.thumbnailUrl}
