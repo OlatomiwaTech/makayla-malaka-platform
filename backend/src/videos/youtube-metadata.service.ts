@@ -50,11 +50,13 @@ const requestJson = async <T>(url: URL, apiKey: string): Promise<T> => {
   let response: Response;
 
   try {
+    // The YouTube Data API specifies API keys via the `key` query parameter.
+    // Keep this request server-side and never log the resulting URL.
+    url.searchParams.set('key', apiKey);
     response = await fetch(url, {
       signal: AbortSignal.timeout(8_000),
       headers: {
         Accept: 'application/json',
-        'x-goog-api-key': apiKey,
       },
     });
   } catch (error) {
