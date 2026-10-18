@@ -8,12 +8,27 @@ type ApiError = {
 };
 
 let accessToken: string | null = null;
+const accessTokenStorageKey = 'makayla_access_token';
 
 export const authTokenStore = {
-	get: () => accessToken,
+	get: () => {
+		if (typeof window === 'undefined') {
+			return accessToken;
+		}
+
+		return window.sessionStorage.getItem(accessTokenStorageKey) ?? accessToken;
+	},
 
 	set: (token: string | null) => {
 		accessToken = token;
+
+		if (typeof window !== 'undefined') {
+			if (token) {
+				window.sessionStorage.setItem(accessTokenStorageKey, token);
+			} else {
+				window.sessionStorage.removeItem(accessTokenStorageKey);
+			}
+		}
 	},
 };
 

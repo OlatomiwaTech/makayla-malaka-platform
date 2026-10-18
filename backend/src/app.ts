@@ -96,6 +96,7 @@ const errorHandler: ErrorRequestHandler = (
     err instanceof Error &&
     [
       'Invalid credentials',
+      'Invalid email or password.',
       'This account is not active',
       'Invalid refresh token',
       'Refresh token has been revoked',

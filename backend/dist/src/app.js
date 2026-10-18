@@ -67,6 +67,7 @@ const errorHandler = (err, _req, res, _next) => {
     if (err instanceof Error &&
         [
             'Invalid credentials',
+            'Invalid email or password.',
             'This account is not active',
             'Invalid refresh token',
             'Refresh token has been revoked',

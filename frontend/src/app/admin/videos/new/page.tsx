@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -75,10 +76,16 @@ export default function NewVideoPage() {
         method: 'POST',
         body: JSON.stringify(data),
       });
-
-      router.push('/admin/videos');
+      router.push('/admin');
       router.refresh();
     } catch (error) {
+      const status =
+        typeof error === 'object' &&
+        error !== null &&
+        'status' in error &&
+        typeof error.status === 'number'
+          ? error.status
+          : undefined;
       const message =
         error instanceof Error
           ? error.message
@@ -89,14 +96,23 @@ export default function NewVideoPage() {
             ? error.message
             : 'Failed to add video';
 
-      setServerError(message);
+      setServerError(
+        status === 401
+          ? 'Please sign in with an editor or admin account before adding a video.'
+          : status === 403
+            ? 'Your account is not authorized to manage videos.'
+            : message,
+      );
     }
   };
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-black/35">
+        <Link href="/admin" className="text-sm font-medium text-black/55 transition hover:text-black">
+          Back to content studio
+        </Link>
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-black/35">
           Admin
         </p>
 
@@ -108,6 +124,14 @@ export default function NewVideoPage() {
           Add a video from Makayla&apos;s YouTube
           channel to the platform.
         </p>
+        <a
+          href="https://www.youtube.com/@MakaylaSuperstar"
+          target="_blank"
+          rel="noreferrer"
+          className="mt-3 inline-flex text-sm font-semibold underline underline-offset-4"
+        >
+          Open Makayla&apos;s official YouTube channel
+        </a>
       </div>
 
       <form
@@ -226,6 +250,11 @@ export default function NewVideoPage() {
         {serverError && (
           <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-700">
             {serverError}
+            {(serverError.includes('sign in') || serverError.includes('authorized')) && (
+              <Link href="/admin/login" className="ml-2 font-semibold underline underline-offset-2">
+                Sign in
+              </Link>
+            )}
           </div>
         )}
 
