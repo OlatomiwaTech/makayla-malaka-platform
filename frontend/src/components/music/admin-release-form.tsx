@@ -139,6 +139,7 @@ export function AdminMusicReleaseForm({
   } = useFieldArray({ control, name: 'links' });
   const title = useWatch({ control, name: 'title' });
   const artistName = useWatch({ control, name: 'artistName' });
+  const description = useWatch({ control, name: 'description' });
   const coverUrl = useWatch({ control, name: 'coverUrl' });
   const releaseDate = useWatch({ control, name: 'releaseDate' });
   const tracks = useWatch({ control, name: 'tracks' });

@@ -48,15 +48,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       videos: [{ url: `https://www.youtube.com/embed/${video.youtubeVideoId}` }],
     },
     twitter: {
-      card: 'player',
+      card: 'summary_large_image',
       title,
       description,
       images: [image],
-      players: {
-        playerUrl: `https://www.youtube.com/embed/${video.youtubeVideoId}`,
-        width: 1280,
-        height: 720,
-      },
     },
   };
 }
