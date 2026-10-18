@@ -54,8 +54,8 @@ export function Hero({ latestVideoHref }: HeroProps) {
         <div className="absolute -bottom-20 -left-12 size-64 rounded-full bg-[#c99a65]/45 sm:size-80" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_25%,rgba(255,255,255,0.42),transparent_34%)]" />
         <Image
-          src="/makyla.png"
-          alt="Makayla Malaka performing live"
+          src="/makayla-image.jpg"
+          alt="Makayla Malaka smiling"
           fill
           priority
           sizes="(max-width: 1024px) 100vw, 45vw"

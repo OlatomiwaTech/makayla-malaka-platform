@@ -17,10 +17,10 @@ export const metadata: Metadata = {
     url: '/',
     images: [
       {
-        url: '/makyla.png',
-        width: 1200,
-        height: 1200,
-        alt: 'Makayla Malaka official website',
+        url: '/makayla-image.jpg',
+        width: 474,
+        height: 474,
+        alt: 'Makayla Malaka smiling',
       },
     ],
   },
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     title: 'Makayla Malaka | Official Website',
     description:
       'New music, official videos, news, events, and updates from artist Makayla Malaka.',
-    images: ['/makyla.png'],
+    images: ['/makayla-image.jpg'],
   },
 };
 

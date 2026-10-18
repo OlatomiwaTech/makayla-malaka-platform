@@ -76,15 +76,6 @@ export function HomeExperience() {
             className="-z-20 object-cover object-[center_42%]"
           />
           <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#241323]/95 via-[#241323]/65 to-[#241323]/10" />
-          <div className="absolute bottom-7 right-8 z-10 hidden h-28 w-48 overflow-hidden rounded-2xl border-4 border-[#fff3e4]/90 shadow-xl lg:block">
-            <Image
-              src="/makayla-performance.jpeg"
-              alt="Makayla performing beneath pink stage lights"
-              fill
-              sizes="192px"
-              className="object-cover"
-            />
-          </div>
           <div className="max-w-xl px-6 py-8 text-white sm:px-10 sm:py-10">
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#f8d16e]">Feel the moment</p>
             <h2 className="mt-3 font-serif text-3xl leading-tight tracking-[-0.03em] sm:text-4xl">Good music brings us together.</h2>
