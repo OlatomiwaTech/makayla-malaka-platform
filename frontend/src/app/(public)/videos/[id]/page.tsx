@@ -69,8 +69,8 @@ export default async function VideoPage({ params }: Props) {
           ? [video.thumbnailUrl]
           : [`https://i.ytimg.com/vi/${video.youtubeVideoId}/hqdefault.jpg`],
         embedUrl: `https://www.youtube.com/embed/${video.youtubeVideoId}`,
-        ...(video.sourcePublishedAt || video.publishedAt
-          ? { uploadDate: video.sourcePublishedAt || video.publishedAt }
+        ...(video.sourcePublishedAt
+          ? { uploadDate: video.sourcePublishedAt }
           : {}),
         ...(video.durationSeconds
           ? { duration: isoDuration(video.durationSeconds) }

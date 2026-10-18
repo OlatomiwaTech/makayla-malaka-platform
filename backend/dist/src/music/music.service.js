@@ -148,7 +148,7 @@ export const getPublishedReleases = async (page, limit) => {
             lte: new Date(),
         },
     };
-    const [releases, total] = await prisma.$transaction([
+    const [releases, total] = await Promise.all([
         prisma.musicRelease.findMany({
             where,
             orderBy: {
@@ -236,7 +236,7 @@ export const getManagedReleases = async (query) => {
             }
             : {}),
     };
-    const [releases, total] = await prisma.$transaction([
+    const [releases, total] = await Promise.all([
         prisma.musicRelease.findMany({
             where,
             orderBy: {

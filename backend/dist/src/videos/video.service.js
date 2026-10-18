@@ -122,7 +122,7 @@ export const getPublishedVideos = async (page, limit, category) => {
         status: 'PUBLISHED',
         ...(category ? { category } : {}),
     };
-    const [videos, total] = await prisma.$transaction([
+    const [videos, total] = await Promise.all([
         prisma.video.findMany({
             where,
             orderBy: {

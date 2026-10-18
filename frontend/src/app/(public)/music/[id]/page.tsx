@@ -61,31 +61,33 @@ export default async function MusicReleasePage({ params }: Props) {
   const structuredData = release
     ? {
         '@context': 'https://schema.org',
-        '@type': 'MusicAlbum',
+        '@type': release.type === 'SINGLE' ? 'MusicRecording' : 'MusicAlbum',
         name: release.title,
         byArtist: {
           '@type': 'Person',
           name: release.artistName,
         },
         datePublished: release.releaseDate,
-        numTracks: release.tracks.length,
         ...(release.coverUrl ? { image: release.coverUrl } : {}),
         ...(release.description ? { description: release.description } : {}),
         ...(release.links.length
           ? { sameAs: release.links.map((link) => link.url) }
           : {}),
-        track: {
-          '@type': 'ItemList',
-          numberOfItems: release.tracks.length,
-          itemListElement: release.tracks.map((track) => ({
-            '@type': 'MusicRecording',
-            position: track.trackNumber,
-            name: track.title,
-            ...(track.durationSeconds
-              ? { duration: isoDuration(track.durationSeconds) }
-              : {}),
-          })),
-        },
+        ...(release.type === 'SINGLE'
+          ? release.tracks[0]?.durationSeconds
+            ? { duration: isoDuration(release.tracks[0].durationSeconds) }
+            : {}
+          : {
+              numTracks: release.tracks.length,
+              track: release.tracks.map((track) => ({
+                '@type': 'MusicRecording',
+                position: track.trackNumber,
+                name: track.title,
+                ...(track.durationSeconds
+                  ? { duration: isoDuration(track.durationSeconds) }
+                  : {}),
+              })),
+            }),
         url: canonicalUrl(`/music/${release.id}`),
       }
     : null;

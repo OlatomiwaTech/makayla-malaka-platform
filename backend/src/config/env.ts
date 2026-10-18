@@ -9,7 +9,7 @@ const envSchema = z.object({
   FRONTEND_URL: z
     .string()
     .url()
-    .default('http://localhost:3000'),
+    .optional(),
 
   DATABASE_URL: z
     .string()
@@ -35,4 +35,27 @@ if (!parsedEnv.success) {
   process.exit(1);
 }
 
-export const env = parsedEnv.data;
+if (parsedEnv.data.NODE_ENV === 'production') {
+  if (!parsedEnv.data.FRONTEND_URL) {
+    console.error('Invalid environment configuration: FRONTEND_URL is required in production.');
+    process.exit(1);
+  }
+
+  const frontendUrl = new URL(parsedEnv.data.FRONTEND_URL);
+  if (
+    frontendUrl.protocol !== 'https:' ||
+    frontendUrl.username ||
+    frontendUrl.password ||
+    frontendUrl.pathname !== '/' ||
+    frontendUrl.search ||
+    frontendUrl.hash
+  ) {
+    console.error('Invalid environment configuration: FRONTEND_URL must be an HTTPS origin.');
+    process.exit(1);
+  }
+}
+
+export const env = {
+  ...parsedEnv.data,
+  FRONTEND_URL: parsedEnv.data.FRONTEND_URL ?? 'http://localhost:3000',
+};

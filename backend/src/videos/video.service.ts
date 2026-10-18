@@ -175,7 +175,7 @@ export const getPublishedVideos = async (
     ...(category ? { category } : {}),
   };
 
-  const [videos, total] = await prisma.$transaction([
+  const [videos, total] = await Promise.all([
     prisma.video.findMany({
       where,
       orderBy: {
