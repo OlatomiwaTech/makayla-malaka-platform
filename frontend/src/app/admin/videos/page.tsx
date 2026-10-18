@@ -36,6 +36,7 @@ export default function ManageVideosPage() {
   const [page, setPage] = useState(1);
   const [workingId, setWorkingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
   const query = useQuery({
     queryKey: ['managed-videos', { search, status, category, page }],
@@ -55,15 +56,31 @@ export default function ManageVideosPage() {
 
   const updateStatus = async (video: ManagedVideo, nextStatus: ManagedVideo['status']) => {
     setActionError(null);
+    setActionSuccess(null);
     setWorkingId(video.id);
     try {
       await api<VideoResponse>(`/videos/${video.id}`, {
         method: 'PATCH',
         body: JSON.stringify({ status: nextStatus }),
       });
+      setActionSuccess(
+        nextStatus === 'DRAFT'
+          ? `“${video.title}” is unpublished and hidden from the public videos page.`
+          : nextStatus === 'PUBLISHED'
+            ? `“${video.title}” is now published.`
+            : nextStatus === 'ARCHIVED'
+              ? `“${video.title}” has been archived.`
+              : `“${video.title}” has been updated.`,
+      );
       await queryClient.invalidateQueries({ queryKey: ['managed-videos'] });
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : 'Unable to update this video.');
+      const message =
+        error instanceof Error
+          ? error.message
+          : typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string'
+            ? error.message
+            : 'Unable to update this video.';
+      setActionError(`Could not update “${video.title}”: ${message}`);
     } finally {
       setWorkingId(null);
     }
@@ -110,6 +127,7 @@ export default function ManageVideosPage() {
       </form>
 
       {actionError && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">{actionError}</p>}
+      {actionSuccess && <p role="status" aria-live="polite" className="mt-5 rounded-xl bg-green-50 p-4 text-sm text-green-800">{actionSuccess}</p>}
       {query.isLoading && <p className="mt-8 text-sm text-black/50">Loading videos…</p>}
       {query.isError && <div role="alert" className="mt-8 rounded-2xl bg-red-50 p-6 text-sm text-red-700">Unable to load videos. Sign in with an authorized content manager account and try again.<Link href="/admin/login" className="ml-2 font-semibold underline">Sign in</Link></div>}
       {!query.isLoading && !query.isError && videos.length === 0 && (
@@ -137,7 +155,7 @@ export default function ManageVideosPage() {
             <div className="flex flex-wrap gap-2 sm:justify-end">
               {video.status !== 'ARCHIVED' && (
                 <button type="button" disabled={workingId === video.id} onClick={() => updateStatus(video, video.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED')} className="rounded-full bg-black px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50">
-                  {video.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'}
+                  {workingId === video.id ? (video.status === 'PUBLISHED' ? 'Unpublishing…' : 'Publishing…') : (video.status === 'PUBLISHED' ? 'Unpublish' : 'Publish')}
                 </button>
               )}
               <button type="button" disabled={workingId === video.id} onClick={() => updateStatus(video, video.status === 'ARCHIVED' ? 'DRAFT' : 'ARCHIVED')} className="rounded-full border border-black/10 px-4 py-2.5 text-xs font-semibold hover:bg-black/[0.04] disabled:opacity-50">
