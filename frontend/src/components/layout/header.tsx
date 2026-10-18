@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, UserRound } from 'lucide-react';
 
 const links = [
 	{ href: '/', label: 'Home' },
@@ -48,29 +48,32 @@ export function Header() {
 					</nav>
 
 					<div className="flex items-center gap-2">
-						<button
-							type="button"
-							aria-label="Search"
+						<Link
+							href="/search"
+							aria-label="Search the site"
+							title="Search"
 							className="grid size-10 place-items-center rounded-full bg-[#f7e8d8]/75 text-[#654b44] transition hover:bg-[#f8d8bd] hover:text-[#8d344b]"
 						>
 							<Search size={19} strokeWidth={1.8} />
-						</button>
+						</Link>
 
-						<button
-							type="button"
-							aria-label="Notifications"
+						<Link
+							href="/#latest-updates"
+							aria-label="Latest updates"
+							title="Latest updates"
 							className="grid size-10 place-items-center rounded-full bg-[#f7e8d8]/75 text-[#654b44] transition hover:bg-[#f8d8bd] hover:text-[#8d344b]"
 						>
 							<Bell size={19} strokeWidth={1.8} />
-						</button>
+						</Link>
 
-						<button
-							type="button"
-							aria-label="Profile"
-							className="ml-1 grid size-9 place-items-center rounded-full bg-[#8d344b] text-xs font-semibold text-white shadow-sm shadow-[#8d344b]/20"
+						<Link
+							href="/register"
+							aria-label="Create an account"
+							title="Create an account"
+							className="ml-1 grid size-9 place-items-center rounded-full bg-[#8d344b] text-white shadow-sm shadow-[#8d344b]/20 transition hover:bg-[#74283d]"
 						>
-							M
-						</button>
+							<UserRound size={16} strokeWidth={2} />
+						</Link>
 					</div>
 				</div>
 			</div>
