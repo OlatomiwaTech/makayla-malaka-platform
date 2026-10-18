@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowUpRight, Disc3, ExternalLink, Music2, Newspaper, Video as VideoIcon } from 'lucide-react';
+import { ArrowUpRight, Disc3, ExternalLink, Newspaper, Video as VideoIcon } from 'lucide-react';
 
 import { Hero } from '@/components/home/hero';
 import { SectionHeader } from '@/components/home/section-header';
@@ -237,7 +237,6 @@ export function HomeExperience() {
             <div className="flex flex-wrap gap-3">
               {socialLinks.map((link) => (
                 <a key={link.href} href={link.href} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 border border-black/15 bg-white px-4 py-2 text-sm font-semibold transition-colors hover:border-[#ed1689] hover:text-[#c30c6c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ed1689]">
-                  <Music2 size={15} aria-hidden="true" />
                   {link.label}
                   <ExternalLink size={13} aria-hidden="true" />
                 </a>

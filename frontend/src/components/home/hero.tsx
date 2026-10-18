@@ -9,7 +9,7 @@ type HeroProps = {
 export function Hero({ latestVideoHref }: HeroProps) {
   return (
     <section className="relative isolate grid overflow-hidden rounded-[2rem] bg-[#fff3e4] shadow-[0_24px_80px_-48px_rgba(92,43,30,0.38)] ring-1 ring-[#8b4a35]/10 lg:min-h-[600px] lg:grid-cols-[1.08fr_0.92fr]">
-      <div className="relative z-10 flex flex-col justify-between px-6 py-8 sm:px-10 sm:py-11 lg:px-14 lg:py-12">
+      <div className="relative z-10 order-2 flex flex-col justify-between px-6 py-8 sm:px-10 sm:py-11 lg:order-1 lg:px-14 lg:py-12">
         <div className="flex items-center gap-3">
           <span className="grid size-10 place-items-center rounded-full bg-[#f8d8bd] font-serif text-xl text-[#b64d60]" aria-hidden="true">✦</span>
           <div>
@@ -49,7 +49,7 @@ export function Hero({ latestVideoHref }: HeroProps) {
         </div>
       </div>
 
-      <div className="relative min-h-[360px] overflow-hidden bg-[#e8b89a] sm:min-h-[520px] lg:min-h-full">
+      <div className="relative order-1 min-h-[300px] overflow-hidden bg-[#e8b89a] sm:min-h-[400px] lg:order-2 lg:min-h-full">
         <div className="absolute -right-12 -top-14 size-64 rounded-full bg-[#f8d8bd]/75 sm:size-80" />
         <div className="absolute -bottom-20 -left-12 size-64 rounded-full bg-[#d88c7c]/45 sm:size-80" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_25%,rgba(255,255,255,0.42),transparent_34%)]" />
