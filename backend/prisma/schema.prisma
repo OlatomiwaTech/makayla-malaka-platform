@@ -9,6 +9,7 @@ datasource db {
 
 enum UserRole {
   FAN
+  MEDIA_EDITOR
   EDITOR
   MODERATOR
   ADMIN

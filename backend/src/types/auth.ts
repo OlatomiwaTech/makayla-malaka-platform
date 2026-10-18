@@ -1,4 +1,4 @@
-export type UserRole = 'FAN' | 'EDITOR' | 'MODERATOR' | 'ADMIN';
+export type UserRole = 'FAN' | 'MEDIA_EDITOR' | 'EDITOR' | 'MODERATOR' | 'ADMIN';
 export type UserStatus = 'ACTIVE' | 'SUSPENDED' | 'DELETED';
 
 export type AuthUser = {

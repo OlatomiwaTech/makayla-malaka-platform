@@ -8,7 +8,7 @@ const toAuthUser = (user: {
   id: string;
   email: string;
   username: string;
-  role: 'FAN' | 'EDITOR' | 'MODERATOR' | 'ADMIN';
+  role: 'FAN' | 'MEDIA_EDITOR' | 'EDITOR' | 'MODERATOR' | 'ADMIN';
   status: 'ACTIVE' | 'SUSPENDED' | 'DELETED';
 }): AuthUser => ({
   id: user.id,

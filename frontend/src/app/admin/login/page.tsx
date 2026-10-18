@@ -17,7 +17,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 type LoginResponse = {
   user: {
-    role: 'FAN' | 'EDITOR' | 'MODERATOR' | 'ADMIN';
+    role: 'FAN' | 'MEDIA_EDITOR' | 'EDITOR' | 'MODERATOR' | 'ADMIN';
   };
   token: string;
 };
@@ -42,7 +42,11 @@ export default function AdminLoginPage() {
         body: JSON.stringify(data),
       });
 
-      if (result.user.role !== 'EDITOR' && result.user.role !== 'ADMIN') {
+      if (
+        result.user.role !== 'MEDIA_EDITOR' &&
+        result.user.role !== 'EDITOR' &&
+        result.user.role !== 'ADMIN'
+      ) {
         authTokenStore.set(null);
         setServerError('This account does not have permission to manage content.');
         return;

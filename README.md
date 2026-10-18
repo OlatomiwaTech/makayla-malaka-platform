@@ -240,12 +240,13 @@ This creates or updates the tables in the Neon database without deleting existin
 
 ### Owner and content-manager accounts
 
-Set a private random `ADMIN_SETUP_KEY` of at least 32 characters in `backend/.env` before starting the backend. Open `/admin/setup` and use that key to create the first owner account; this endpoint is disabled after an admin exists. New registrations are regular accounts by default. The owner can grant or revoke content-only access at `/admin/accounts`; content managers can manage music and videos but cannot manage accounts or grant admin permissions.
+Set a private random `ADMIN_SETUP_KEY` of at least 32 characters in `backend/.env` before starting the backend. Open `/admin/setup` and use that key to create the first owner account; this endpoint is disabled after an admin exists. New registrations are regular accounts by default. The owner can grant or revoke the `MEDIA_EDITOR` role at `/admin/accounts`; media editors can manage music and videos but cannot manage posts, accounts, or admin permissions.
 
 ## Planned User Roles
 
 ```text
 FAN
+MEDIA_EDITOR
 EDITOR
 MODERATOR
 ADMIN

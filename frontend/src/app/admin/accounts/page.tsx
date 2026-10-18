@@ -10,7 +10,7 @@ type ManagedAccount = {
   id: string;
   email: string;
   username: string;
-  role: 'FAN' | 'EDITOR' | 'MODERATOR' | 'ADMIN';
+  role: 'FAN' | 'MEDIA_EDITOR' | 'EDITOR' | 'MODERATOR' | 'ADMIN';
   status: 'ACTIVE' | 'SUSPENDED' | 'DELETED';
   createdAt: string;
   profile: { displayName: string } | null;
@@ -36,7 +36,7 @@ export default function AdminAccountsPage() {
     queryFn: () => api<AccountsResponse>('/admin/accounts'),
   });
   const roleMutation = useMutation({
-    mutationFn: ({ id, role }: { id: string; role: 'FAN' | 'EDITOR' }) =>
+    mutationFn: ({ id, role }: { id: string; role: 'FAN' | 'MEDIA_EDITOR' }) =>
       api<AccountResponse>(`/admin/accounts/${id}/role`, {
         method: 'PATCH',
         body: JSON.stringify({ role }),
@@ -117,12 +117,14 @@ export default function AdminAccountsPage() {
                 {account.role === 'ADMIN'
                   ? 'Full owner access'
                   : account.role === 'EDITOR'
-                    ? 'Music & videos'
-                    : account.role === 'MODERATOR'
-                      ? 'Moderator'
-                      : 'Regular account'}
+                    ? 'Editor'
+                    : account.role === 'MEDIA_EDITOR'
+                      ? 'Music & videos'
+                      : account.role === 'MODERATOR'
+                        ? 'Moderator'
+                        : 'Regular account'}
               </span>
-              {account.role === 'ADMIN' || account.role === 'MODERATOR' ? (
+              {account.role === 'ADMIN' || account.role === 'EDITOR' || account.role === 'MODERATOR' ? (
                 <span aria-hidden="true" />
               ) : (
                 <button
@@ -130,15 +132,15 @@ export default function AdminAccountsPage() {
                   disabled={roleMutation.isPending || account.status !== 'ACTIVE'}
                   onClick={() => roleMutation.mutate({
                     id: account.id,
-                    role: account.role === 'EDITOR' ? 'FAN' : 'EDITOR',
+                    role: account.role === 'MEDIA_EDITOR' ? 'FAN' : 'MEDIA_EDITOR',
                   })}
                   className={`rounded-full px-4 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${
-                    account.role === 'EDITOR'
+                    account.role === 'MEDIA_EDITOR'
                       ? 'border border-black/10 hover:bg-red-50 hover:text-red-700'
                       : 'bg-black text-white hover:bg-black/80'
                   }`}
                 >
-                  {account.role === 'EDITOR' ? 'Revoke' : 'Grant access'}
+                  {account.role === 'MEDIA_EDITOR' ? 'Revoke' : 'Grant access'}
                 </button>
               )}
             </div>

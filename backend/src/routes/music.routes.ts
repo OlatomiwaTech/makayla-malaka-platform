@@ -32,14 +32,14 @@ router.get(
 router.post(
 	'/',
 	requireAuth,
-	requireRole('EDITOR', 'ADMIN'),
+	requireRole('MEDIA_EDITOR', 'EDITOR', 'ADMIN'),
 	asyncHandler(create),
 );
 
 router.patch(
 	'/:id',
 	requireAuth,
-	requireRole('EDITOR', 'ADMIN'),
+	requireRole('MEDIA_EDITOR', 'EDITOR', 'ADMIN'),
 	asyncHandler(update),
 );
 
