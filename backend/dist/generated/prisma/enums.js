@@ -9,6 +9,7 @@
 */
 export const UserRole = {
     FAN: 'FAN',
+    MEDIA_EDITOR: 'MEDIA_EDITOR',
     EDITOR: 'EDITOR',
     MODERATOR: 'MODERATOR',
     ADMIN: 'ADMIN'

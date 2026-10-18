@@ -138,6 +138,15 @@ export const bootstrapAdmin = async (
       throw new Error('Admin setup has already been completed');
     }
 
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      error.code === 'P2002'
+    ) {
+      throw new Error('A user with that email or username already exists.');
+    }
+
     throw error;
   }
 };

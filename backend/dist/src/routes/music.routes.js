@@ -7,7 +7,7 @@ const router = Router();
 router.get('/featured', asyncHandler(featured));
 router.get('/', asyncHandler(list));
 router.get('/:id', asyncHandler(getOne));
-router.post('/', requireAuth, requireRole('EDITOR', 'ADMIN'), asyncHandler(create));
-router.patch('/:id', requireAuth, requireRole('EDITOR', 'ADMIN'), asyncHandler(update));
+router.post('/', requireAuth, requireRole('MEDIA_EDITOR', 'EDITOR', 'ADMIN'), asyncHandler(create));
+router.patch('/:id', requireAuth, requireRole('MEDIA_EDITOR', 'EDITOR', 'ADMIN'), asyncHandler(update));
 export default router;
 //# sourceMappingURL=music.routes.js.map

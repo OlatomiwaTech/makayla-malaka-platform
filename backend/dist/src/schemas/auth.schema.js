@@ -21,4 +21,7 @@ export const loginSchema = z.object({
     email: z.email('Please enter a valid email address.'),
     password: z.string().min(8, 'Password must be at least 8 characters long.').max(128),
 });
+export const bootstrapAdminSchema = registerSchema.extend({
+    setupKey: z.string().min(1, 'Setup key is required.'),
+});
 //# sourceMappingURL=auth.schema.js.map
