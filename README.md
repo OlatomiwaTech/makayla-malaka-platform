@@ -250,7 +250,7 @@ Public pages include canonical URLs, Open Graph/Twitter previews, and Schema.org
 
 Set a private random `ADMIN_SETUP_KEY` of at least 32 characters in `backend/.env` before starting the backend. Open `/admin/setup` and use that key to create the first owner account; this endpoint is disabled after an admin exists. New registrations are regular accounts by default. The owner can grant or revoke the `MEDIA_EDITOR` role at `/admin/accounts`; media editors can manage music and videos but cannot manage posts, accounts, or admin permissions.
 
-To import complete public YouTube video metadata when a video URL is analyzed, set a server-side `YOUTUBE_API_KEY` in `backend/.env` with YouTube Data API v3 enabled. Without that key, the form uses YouTube oEmbed for the video title, channel, and thumbnail; YouTube's publish time, duration, and category ID are unavailable in that fallback.
+To import complete public YouTube video metadata when a video URL is analyzed, set a server-side `YOUTUBE_API_KEY` in `backend/.env` with YouTube Data API v3 enabled. Without that key, the form uses YouTube oEmbed for the video title, channel, and thumbnail; YouTube's publish time, duration, and category ID are unavailable in that fallback. The backend must allow outbound HTTPS to `www.youtube.com` (and to `www.googleapis.com` when using the Data API key). If lookup is temporarily unreachable, enter the title manually and the video can still be saved with YouTube's standard thumbnail.
 
 ## Planned User Roles
 

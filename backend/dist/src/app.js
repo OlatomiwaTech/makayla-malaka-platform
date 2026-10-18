@@ -135,6 +135,18 @@ const errorHandler = (err, _req, res, _next) => {
         });
         return;
     }
+    if (err instanceof Error &&
+        [
+            'YouTube metadata service is unreachable',
+            'YouTube metadata request timed out',
+            'YouTube metadata service returned an invalid response',
+        ].includes(err.message)) {
+        res.status(502).json({
+            success: false,
+            message: 'Could not reach YouTube to analyze this link. Check that the backend can make outbound HTTPS requests to www.youtube.com. If using YOUTUBE_API_KEY, allow www.googleapis.com too. You can still add the video by entering its title manually; a standard thumbnail will be generated.',
+        });
+        return;
+    }
     res.status(500).json({
         success: false,
         message: 'Internal server error',

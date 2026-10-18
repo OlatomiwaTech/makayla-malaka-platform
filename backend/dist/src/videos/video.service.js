@@ -2,12 +2,25 @@ import { prisma } from '../lib/prisma.js';
 import { extractYouTubeVideoId, getYouTubeEmbedUrl, getYouTubeThumbnailUrl, } from '../lib/youtube.js';
 import { getYouTubeVideoMetadata } from './youtube-metadata.service.js';
 export const previewVideo = (url) => getYouTubeVideoMetadata(url);
+const canUseManualVideoMetadata = (error) => error instanceof Error &&
+    [
+        'YouTube metadata service is unreachable',
+        'YouTube metadata request timed out',
+    ].includes(error.message);
 export const createVideo = async (input) => {
     const youtubeVideoId = extractYouTubeVideoId(input.youtubeUrl);
     if (!youtubeVideoId) {
         throw new Error('Invalid YouTube video URL');
     }
-    const metadata = await getYouTubeVideoMetadata(input.youtubeUrl);
+    let metadata;
+    try {
+        metadata = await getYouTubeVideoMetadata(input.youtubeUrl);
+    }
+    catch (error) {
+        if (!canUseManualVideoMetadata(error))
+            throw error;
+        metadata = null;
+    }
     const existingVideo = await prisma.video.findUnique({
         where: {
             youtubeVideoId,
@@ -19,17 +32,17 @@ export const createVideo = async (input) => {
     return prisma.video.create({
         data: {
             youtubeVideoId,
-            title: input.title || metadata.title,
-            description: input.description?.trim() || metadata.description,
+            title: input.title || metadata?.title || 'Untitled video',
+            description: input.description?.trim() || metadata?.description || null,
             seoTitle: input.seoTitle || null,
             seoDescription: input.seoDescription || null,
             thumbnailUrl: input.thumbnailUrl ??
-                metadata.thumbnailUrl ??
+                metadata?.thumbnailUrl ??
                 getYouTubeThumbnailUrl(youtubeVideoId),
-            channelTitle: metadata.channelTitle,
-            sourcePublishedAt: metadata.sourcePublishedAt,
-            durationSeconds: metadata.durationSeconds,
-            youtubeCategoryId: metadata.categoryId,
+            channelTitle: metadata?.channelTitle ?? null,
+            sourcePublishedAt: metadata?.sourcePublishedAt ?? null,
+            durationSeconds: metadata?.durationSeconds ?? null,
+            youtubeCategoryId: metadata?.categoryId ?? null,
             videoUrl: getYouTubeEmbedUrl(youtubeVideoId),
             category: input.category,
             status: input.status,

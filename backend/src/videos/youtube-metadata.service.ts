@@ -41,16 +41,30 @@ const videoDurationSeconds = (duration: string | undefined) => {
 };
 
 const requestJson = async <T>(url: URL): Promise<T> => {
-  const response = await fetch(url, {
-    signal: AbortSignal.timeout(8_000),
-    headers: { Accept: 'application/json' },
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(url, {
+      signal: AbortSignal.timeout(8_000),
+      headers: { Accept: 'application/json' },
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === 'TimeoutError') {
+      throw new Error('YouTube metadata request timed out');
+    }
+
+    throw new Error('YouTube metadata service is unreachable');
+  }
 
   if (!response.ok) {
     throw new Error(`YouTube metadata request failed (${response.status})`);
   }
 
-  return response.json() as Promise<T>;
+  try {
+    return (await response.json()) as T;
+  } catch {
+    throw new Error('YouTube metadata service returned an invalid response');
+  }
 };
 
 const metadataFromYouTubeApi = async (

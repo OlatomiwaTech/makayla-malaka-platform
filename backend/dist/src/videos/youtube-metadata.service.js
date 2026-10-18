@@ -12,14 +12,28 @@ const videoDurationSeconds = (duration) => {
     return hours * 3600 + minutes * 60 + seconds;
 };
 const requestJson = async (url) => {
-    const response = await fetch(url, {
-        signal: AbortSignal.timeout(8_000),
-        headers: { Accept: 'application/json' },
-    });
+    let response;
+    try {
+        response = await fetch(url, {
+            signal: AbortSignal.timeout(8_000),
+            headers: { Accept: 'application/json' },
+        });
+    }
+    catch (error) {
+        if (error instanceof Error && error.name === 'TimeoutError') {
+            throw new Error('YouTube metadata request timed out');
+        }
+        throw new Error('YouTube metadata service is unreachable');
+    }
     if (!response.ok) {
         throw new Error(`YouTube metadata request failed (${response.status})`);
     }
-    return response.json();
+    try {
+        return (await response.json());
+    }
+    catch {
+        throw new Error('YouTube metadata service returned an invalid response');
+    }
 };
 const metadataFromYouTubeApi = async (videoId, apiKey) => {
     const url = new URL('https://www.googleapis.com/youtube/v3/videos');
