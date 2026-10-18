@@ -1,5 +1,5 @@
-import { createVideo, getPublishedVideoById, getPublishedVideos, previewVideo, updateVideo, } from './video.service.js';
-import { createVideoSchema, updateVideoSchema, videoListQuerySchema, videoPreviewQuerySchema, } from '../schemas/video.schema.js';
+import { createVideo, getPublishedVideoById, getPublishedVideos, getManagedVideos, previewVideo, updateVideo, } from './video.service.js';
+import { createVideoSchema, updateVideoSchema, videoListQuerySchema, managedVideoListQuerySchema, videoPreviewQuerySchema, } from '../schemas/video.schema.js';
 export const preview = async (req, res) => {
     const query = videoPreviewQuerySchema.parse(req.query);
     const metadata = await previewVideo(query.url);
@@ -38,6 +38,11 @@ export const list = async (req, res) => {
         success: true,
         data: result,
     });
+};
+export const listManaged = async (req, res) => {
+    const query = managedVideoListQuerySchema.parse(req.query);
+    const result = await getManagedVideos(query);
+    res.status(200).json({ success: true, data: result });
 };
 export const getOne = async (req, res) => {
     const id = req.params.id;

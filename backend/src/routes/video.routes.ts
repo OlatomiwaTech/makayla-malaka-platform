@@ -4,6 +4,7 @@ import {
   create,
   getOne,
   list,
+  listManaged,
   preview,
   update,
 } from '../videos/video.controller.js';
@@ -13,6 +14,13 @@ import { requireRole } from '../middleware/role.middleware.js';
 import { asyncHandler } from '../middleware/async-handler.js';
 
 const router = Router();
+
+router.get(
+  '/manage',
+  requireAuth,
+  requireRole('MEDIA_EDITOR', 'EDITOR', 'ADMIN'),
+  asyncHandler(listManaged),
+);
 
 router.get('/', asyncHandler(list));
 

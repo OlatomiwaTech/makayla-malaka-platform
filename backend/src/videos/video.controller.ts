@@ -4,6 +4,7 @@ import {
   createVideo,
   getPublishedVideoById,
   getPublishedVideos,
+  getManagedVideos,
   previewVideo,
   updateVideo,
 } from './video.service.js';
@@ -12,6 +13,7 @@ import {
   createVideoSchema,
   updateVideoSchema,
   videoListQuerySchema,
+  managedVideoListQuerySchema,
   videoPreviewQuerySchema,
 } from '../schemas/video.schema.js';
 
@@ -77,6 +79,12 @@ export const list = async (
     success: true,
     data: result,
   });
+};
+
+export const listManaged = async (req: Request, res: Response) => {
+  const query = managedVideoListQuerySchema.parse(req.query);
+  const result = await getManagedVideos(query);
+  res.status(200).json({ success: true, data: result });
 };
 
 export const getOne = async (

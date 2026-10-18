@@ -144,6 +144,41 @@ export const getPublishedVideos = async (page, limit, category) => {
         },
     };
 };
+export const getManagedVideos = async (query) => {
+    const skip = (query.page - 1) * query.limit;
+    const where = {
+        ...(query.status ? { status: query.status } : {}),
+        ...(query.category ? { category: query.category } : {}),
+        ...(query.search
+            ? { title: { contains: query.search, mode: 'insensitive' } }
+            : {}),
+    };
+    const [videos, total, categories] = await Promise.all([
+        prisma.video.findMany({
+            where,
+            orderBy: [{ updatedAt: 'desc' }],
+            skip,
+            take: query.limit,
+        }),
+        prisma.video.count({ where }),
+        prisma.video.findMany({
+            distinct: ['category'],
+            select: { category: true },
+            orderBy: { category: 'asc' },
+        }),
+    ]);
+    return {
+        videos,
+        categories: categories.map(({ category }) => category),
+        pagination: {
+            page: query.page,
+            limit: query.limit,
+            total,
+            totalPages: Math.ceil(total / query.limit),
+            hasNextPage: query.page * query.limit < total,
+        },
+    };
+};
 export const getPublishedVideoById = async (videoId) => {
     const video = await prisma.video.findFirst({
         where: {

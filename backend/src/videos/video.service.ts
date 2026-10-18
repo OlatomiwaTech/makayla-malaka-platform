@@ -7,6 +7,7 @@ import {
 
 import type {
   CreateVideoInput,
+  ManagedVideoListQuery,
   UpdateVideoInput,
 } from '../schemas/video.schema.js';
 import { getYouTubeVideoMetadata } from './youtube-metadata.service.js';
@@ -195,6 +196,44 @@ export const getPublishedVideos = async (
       total,
       totalPages: Math.ceil(total / limit),
       hasNextPage: page * limit < total,
+    },
+  };
+};
+
+export const getManagedVideos = async (query: ManagedVideoListQuery) => {
+  const skip = (query.page - 1) * query.limit;
+  const where = {
+    ...(query.status ? { status: query.status } : {}),
+    ...(query.category ? { category: query.category } : {}),
+    ...(query.search
+      ? { title: { contains: query.search, mode: 'insensitive' as const } }
+      : {}),
+  };
+
+  const [videos, total, categories] = await Promise.all([
+    prisma.video.findMany({
+      where,
+      orderBy: [{ updatedAt: 'desc' }],
+      skip,
+      take: query.limit,
+    }),
+    prisma.video.count({ where }),
+    prisma.video.findMany({
+      distinct: ['category'],
+      select: { category: true },
+      orderBy: { category: 'asc' },
+    }),
+  ]);
+
+  return {
+    videos,
+    categories: categories.map(({ category }) => category),
+    pagination: {
+      page: query.page,
+      limit: query.limit,
+      total,
+      totalPages: Math.ceil(total / query.limit),
+      hasNextPage: query.page * query.limit < total,
     },
   };
 };

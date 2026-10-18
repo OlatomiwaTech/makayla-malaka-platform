@@ -84,6 +84,13 @@ export const videoListQuerySchema = z.object({
         .trim()
         .optional(),
 });
+export const managedVideoListQuerySchema = z.object({
+    page: z.coerce.number().int().positive().default(1),
+    limit: z.coerce.number().int().min(1).max(50).default(12),
+    search: z.string().trim().max(150).optional(),
+    status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional(),
+    category: z.string().trim().max(50).optional(),
+});
 export const videoPreviewQuerySchema = z.object({
     url: youtubeUrlSchema,
 });
