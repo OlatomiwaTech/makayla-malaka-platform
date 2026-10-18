@@ -74,6 +74,7 @@ export default function PostPage({
             src={post.imageUrl}
             alt=""
             fill
+            unoptimized
             sizes="(max-width: 896px) 100vw, 896px"
             className="object-cover"
           />

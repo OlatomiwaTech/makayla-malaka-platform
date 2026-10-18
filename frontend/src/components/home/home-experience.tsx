@@ -83,6 +83,7 @@ export function HomeExperience() {
                         src={post.imageUrl}
                         alt=""
                         fill
+                        unoptimized
                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                       />
@@ -133,6 +134,7 @@ export function HomeExperience() {
                     src={featuredRelease.coverUrl}
                     alt={`${featuredRelease.title} cover artwork`}
                     fill
+                    unoptimized
                     sizes="(max-width: 768px) 100vw, 40vw"
                     className="object-cover transition-opacity hover:opacity-90"
                   />
@@ -195,6 +197,7 @@ export function HomeExperience() {
                         src={video.thumbnailUrl}
                         alt={`Thumbnail for ${video.title}`}
                         fill
+                        unoptimized
                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                       />
