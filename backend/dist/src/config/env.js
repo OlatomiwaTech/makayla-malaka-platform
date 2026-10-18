@@ -23,6 +23,10 @@ const envSchema = z.object({
         .trim()
         .regex(/^UC[A-Za-z0-9_-]{22}$/, 'YOUTUBE_CHANNEL_ID must be a YouTube channel ID')
         .optional(),
+    YOUTUBE_CHANNEL_HANDLE: z
+        .string()
+        .trim()
+        .default('@MakaylaSuperstar'),
 });
 const parsedEnv = envSchema.safeParse(process.env);
 if (!parsedEnv.success) {

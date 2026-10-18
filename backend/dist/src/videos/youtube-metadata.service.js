@@ -1,5 +1,7 @@
 import { env } from '../config/env.js';
 import { extractYouTubeVideoId, getYouTubeThumbnailUrl } from '../lib/youtube.js';
+let resolvedOfficialChannel = null;
+let officialChannelLookup = null;
 const videoDurationSeconds = (duration) => {
     if (!duration)
         return null;
@@ -37,6 +39,33 @@ const requestJson = async (url, apiKey) => {
     catch {
         throw new Error('YouTube metadata service returned an invalid response');
     }
+};
+const getOfficialChannelId = async (apiKey) => {
+    if (env.YOUTUBE_CHANNEL_ID)
+        return env.YOUTUBE_CHANNEL_ID;
+    const handle = env.YOUTUBE_CHANNEL_HANDLE;
+    if (resolvedOfficialChannel?.handle === handle) {
+        return resolvedOfficialChannel.id;
+    }
+    if (!officialChannelLookup) {
+        const url = new URL('https://www.googleapis.com/youtube/v3/channels');
+        url.searchParams.set('part', 'id');
+        url.searchParams.set('forHandle', handle);
+        officialChannelLookup = requestJson(url, apiKey)
+            .then((result) => {
+            const channelId = result.items?.[0]?.id;
+            if (!channelId) {
+                throw new Error('Configured YouTube channel could not be found');
+            }
+            resolvedOfficialChannel = { handle, id: channelId };
+            return channelId;
+        })
+            .catch((error) => {
+            officialChannelLookup = null;
+            throw error;
+        });
+    }
+    return officialChannelLookup;
 };
 const metadataFromYouTubeApi = async (videoId, apiKey, approvedChannelId) => {
     const url = new URL('https://www.googleapis.com/youtube/v3/videos');
@@ -84,10 +113,10 @@ export const getYouTubeVideoMetadata = async (value) => {
         throw new Error('Invalid YouTube video URL');
     }
     const apiKey = env.YOUTUBE_API_KEY;
-    const approvedChannelId = env.YOUTUBE_CHANNEL_ID;
-    if (!apiKey || !approvedChannelId) {
+    if (!apiKey) {
         throw new Error('YouTube channel verification is not configured');
     }
+    const approvedChannelId = await getOfficialChannelId(apiKey);
     return metadataFromYouTubeApi(videoId, apiKey, approvedChannelId);
 };
 //# sourceMappingURL=youtube-metadata.service.js.map

@@ -133,7 +133,15 @@ const errorHandler = (err, _req, res, _next) => {
         err.message === 'YouTube channel verification is not configured') {
         res.status(503).json({
             success: false,
-            message: 'YouTube channel verification is not configured. Add YOUTUBE_API_KEY and YOUTUBE_CHANNEL_ID to the backend environment, then restart the backend.',
+            message: 'YouTube channel verification is not configured. Add YOUTUBE_API_KEY to the backend environment, then restart the backend.',
+        });
+        return;
+    }
+    if (err instanceof Error &&
+        err.message === 'Configured YouTube channel could not be found') {
+        res.status(503).json({
+            success: false,
+            message: 'Could not find the configured official YouTube channel. Check YOUTUBE_CHANNEL_HANDLE or set its stable ID in YOUTUBE_CHANNEL_ID.',
         });
         return;
     }
