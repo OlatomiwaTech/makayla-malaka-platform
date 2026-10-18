@@ -1,83 +1,78 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, Play } from 'lucide-react';
 
 type HeroProps = {
-  title?: string;
-  description?: string;
+  latestVideoHref?: string;
 };
 
 export function Hero({
-  title = 'Makayla Malaka',
-  description = "Music, moments, events and everything happening in Makayla&apos;s world.",
+  latestVideoHref,
 }: HeroProps) {
   return (
-    <section className="overflow-hidden rounded-[32px] bg-[#171717] text-white">
-      <div className="grid min-h-[520px] lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="flex flex-col justify-between p-7 sm:p-10 lg:p-14">
-          <div className="flex items-center gap-3">
-            <span className="h-2 w-2 rounded-full bg-[#d7ff42]" />
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/55">
-              Official
-            </span>
-          </div>
+    <section className="grid overflow-hidden bg-white shadow-sm lg:min-h-[540px] lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="flex flex-col justify-between px-6 py-9 sm:px-10 sm:py-12 lg:px-14 lg:py-14">
+        <div className="flex items-center gap-3">
+          <span className="h-2.5 w-2.5 bg-[#ed1689]" />
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-black/55">
+            Official artist platform
+          </span>
+        </div>
 
-          <div className="max-w-xl py-14 lg:py-20">
-            <p className="mb-5 text-sm font-medium text-white/45">
-              MUSIC · LIFE · MOMENTS
-            </p>
+        <div className="max-w-xl py-12 lg:py-16">
+          <p className="mb-5 text-sm font-semibold uppercase tracking-[0.18em] text-[#c30c6c]">
+            Music · life · moments
+          </p>
 
-            <h1 className="text-5xl font-semibold tracking-[-0.055em] sm:text-6xl lg:text-7xl">
-              {title}
-            </h1>
+          <h1 className="text-5xl font-semibold leading-[0.98] tracking-[-0.065em] sm:text-6xl lg:text-7xl">
+            Makayla
+            <br />
+            <span className="text-[#ed1689]">Malaka.</span>
+          </h1>
 
-            <p className="mt-6 max-w-lg text-base leading-7 text-white/60 sm:text-lg">
-              {description}
-            </p>
+          <p className="mt-6 max-w-lg text-base leading-7 text-black/60 sm:text-lg">
+            Welcome to the official home of Makayla Malaka. Discover her music,
+            watch the latest videos, and keep up with what&apos;s new.
+          </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/music"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-white/90"
-              >
-                <Play size={15} fill="currentColor" />
-                Explore music
-              </Link>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/music"
+              className="inline-flex min-h-12 items-center gap-2 bg-black px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#c30c6c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ed1689]"
+            >
+              <Play size={15} fill="currentColor" />
+              Explore music
+            </Link>
 
-              <Link
-                href="/events"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-              >
-                Upcoming events
-                <ArrowUpRight size={15} />
-              </Link>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between border-t border-white/10 pt-5 text-xs text-white/40">
-            <span>Makayla&apos;s official platform</span>
-            <span>2026</span>
+            <Link
+              href={latestVideoHref ?? '/videos'}
+              className="inline-flex min-h-12 items-center gap-2 border border-black/15 px-5 py-3 text-sm font-semibold text-black transition-colors hover:border-[#ed1689] hover:text-[#c30c6c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ed1689]"
+            >
+              {latestVideoHref ? 'Watch latest video' : 'Watch videos'}
+              <ArrowUpRight size={15} />
+            </Link>
           </div>
         </div>
 
-        <div className="relative min-h-[360px] overflow-hidden bg-[#242424] lg:min-h-full">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(215,255,66,0.28),transparent_34%),radial-gradient(circle_at_75%_70%,rgba(124,58,237,0.28),transparent_36%)]" />
+        <p className="border-t border-black/10 pt-5 text-xs text-black/45">
+          Music, stories, and everything in between.
+        </p>
+      </div>
 
-          <div className="absolute inset-6 rounded-[28px] border border-white/10" />
-
-          <div className="absolute bottom-10 left-10 right-10">
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-white/35">
-              THE WORLD OF
-            </p>
-
-            <p className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
-              Makayla
-            </p>
-          </div>
-
-          <div className="absolute right-10 top-10 grid size-20 place-items-center rounded-full border border-white/10 bg-white/5 backdrop-blur">
-            <span className="text-2xl font-semibold">M</span>
-          </div>
+      <div className="relative grid min-h-[300px] place-items-center bg-[#ed1689] p-5 sm:min-h-[420px] sm:p-8 lg:min-h-full">
+        <div className="absolute inset-x-5 top-5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.2em] text-black/65 sm:inset-x-8 sm:top-8">
+          <span>Makayla Malaka</span>
+          <span>MM</span>
         </div>
+        <Image
+          src="/Logo.png"
+          alt="Makayla Malaka logo"
+          width={1280}
+          height={1280}
+          priority
+          sizes="(max-width: 1024px) 100vw, 45vw"
+          className="mt-8 h-auto max-h-[440px] w-full max-w-[520px] object-contain"
+        />
       </div>
     </section>
   );
