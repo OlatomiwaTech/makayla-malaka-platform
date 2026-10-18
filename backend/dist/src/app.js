@@ -120,11 +120,18 @@ const errorHandler = (err, _req, res, _next) => {
         });
         return;
     }
+    if (err instanceof Error && err.message === 'Music release not found') {
+        res.status(404).json({
+            success: false,
+            message: err.message,
+        });
+        return;
+    }
     if (err instanceof Error &&
         err.message.startsWith('YouTube metadata request failed')) {
         res.status(502).json({
             success: false,
-            message: `${err.message}. Check the YouTube Data API key and quota, or try again later.`,
+            message: `${err.message}. The video may be unavailable, or the YouTube Data API key/quota may need attention.`,
         });
         return;
     }

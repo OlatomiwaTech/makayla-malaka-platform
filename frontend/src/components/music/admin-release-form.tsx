@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
@@ -101,7 +101,6 @@ export function AdminMusicReleaseForm({
     control,
     handleSubmit,
     reset,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -117,13 +116,13 @@ export function AdminMusicReleaseForm({
     append: addLink,
     remove: removeLink,
   } = useFieldArray({ control, name: 'links' });
-  const title = watch('title');
-  const artistName = watch('artistName');
-  const coverUrl = watch('coverUrl');
-  const releaseDate = watch('releaseDate');
-  const tracks = watch('tracks');
-  const links = watch('links');
-  const status = watch('status');
+  const title = useWatch({ control, name: 'title' });
+  const artistName = useWatch({ control, name: 'artistName' });
+  const coverUrl = useWatch({ control, name: 'coverUrl' });
+  const releaseDate = useWatch({ control, name: 'releaseDate' });
+  const tracks = useWatch({ control, name: 'tracks' });
+  const links = useWatch({ control, name: 'links' });
+  const status = useWatch({ control, name: 'status' });
 
   const onSubmit = async (formData: FormData) => {
     setServerError(null);

@@ -153,6 +153,7 @@ export const SavedPostScalarFieldEnum = {
 export const MusicReleaseScalarFieldEnum = {
     id: 'id',
     title: 'title',
+    artistName: 'artistName',
     description: 'description',
     coverUrl: 'coverUrl',
     releaseDate: 'releaseDate',

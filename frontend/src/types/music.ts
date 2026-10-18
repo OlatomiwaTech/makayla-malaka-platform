@@ -11,7 +11,6 @@ export type ReleaseStatus =
 export type Track = {
   id: string;
   title: string;
-  artistName: string;
   trackNumber: number;
   durationSeconds: number | null;
   previewUrl: string | null;
@@ -26,6 +25,7 @@ export type MusicPlatformLink = {
 export type MusicRelease = {
   id: string;
   title: string;
+  artistName: string;
   description: string | null;
   coverUrl: string | null;
   releaseDate: string;
