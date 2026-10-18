@@ -42,11 +42,11 @@ export const metadata: Metadata = {
     images: ['/Logo.png'],
   },
   robots: {
-    index: true,
-    follow: true,
+    index: process.env.VERCEL_ENV !== 'preview',
+    follow: process.env.VERCEL_ENV !== 'preview',
     googleBot: {
-      index: true,
-      follow: true,
+      index: process.env.VERCEL_ENV !== 'preview',
+      follow: process.env.VERCEL_ENV !== 'preview',
       'max-image-preview': 'large',
       'max-video-preview': -1,
       'max-snippet': -1,

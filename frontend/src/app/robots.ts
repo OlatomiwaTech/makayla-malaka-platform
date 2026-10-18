@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-import { canonicalUrl } from '@/lib/seo';
+import { canonicalUrl, siteUrl } from '@/lib/seo';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -10,6 +10,6 @@ export default function robots(): MetadataRoute.Robots {
       disallow: ['/admin/', '/api/'],
     },
     sitemap: canonicalUrl('/sitemap.xml'),
-    host: canonicalUrl('/'),
+    host: siteUrl().host,
   };
 }

@@ -2,7 +2,10 @@ import type { MusicRelease } from '@/types/music';
 import type { Video } from '@/types/video';
 
 const apiUrl = (
-  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000/api'
+  process.env.NEXT_PUBLIC_API_URL ??
+    (process.env.NODE_ENV === 'production'
+      ? ''
+      : 'http://localhost:5000/api')
 ).replace(/\/+$/, '');
 
 export const siteUrl = () => {
@@ -17,6 +20,11 @@ export const canonicalUrl = (path: string) =>
   new URL(path, siteUrl()).toString();
 
 const fetchSeoRecord = async <T>(path: string): Promise<T | null> => {
+  if (!apiUrl) {
+    console.error('NEXT_PUBLIC_API_URL is required to generate SEO metadata in production.');
+    return null;
+  }
+
   try {
     const response = await fetch(`${apiUrl}${path}`, {
       next: { revalidate: 300 },
