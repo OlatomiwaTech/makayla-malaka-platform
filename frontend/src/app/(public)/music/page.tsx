@@ -79,6 +79,7 @@ export default function MusicPage() {
                   <h2 className="mt-4 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
                     {featured.title}
                   </h2>
+                  <p className="mt-2 text-sm text-white/50">{featured.artistName}</p>
 
                   {featured.description && (
                     <p className="mt-5 max-w-xl text-sm leading-6 text-white/50">

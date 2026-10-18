@@ -5,7 +5,10 @@ import type {
 
 import {
 	createRelease,
+	duplicateRelease,
 	getFeaturedRelease,
+	getManagedReleaseById,
+	getManagedReleases,
 	getPublishedReleaseById,
 	getPublishedReleases,
 	updateRelease,
@@ -14,6 +17,7 @@ import {
 import {
 	createReleaseSchema,
 	musicListQuerySchema,
+	managedMusicListQuerySchema,
 	updateReleaseSchema,
 } from '../schemas/music.schema.js';
 
@@ -72,6 +76,61 @@ export const list = async (
 	res.status(200).json({
 		success: true,
 		data: result,
+	});
+};
+
+export const listManaged = async (
+	req: Request,
+	res: Response,
+) => {
+	const query = managedMusicListQuerySchema.parse(req.query);
+	const result = await getManagedReleases(query);
+
+	res.status(200).json({
+		success: true,
+		data: result,
+	});
+};
+
+export const getManagedOne = async (
+	req: Request,
+	res: Response,
+) => {
+	const id = req.params.id;
+
+	if (!id || Array.isArray(id)) {
+		return res.status(400).json({
+			success: false,
+			message: 'Music release id is required.',
+		});
+	}
+
+	const release = await getManagedReleaseById(id);
+
+	res.status(200).json({
+		success: true,
+		data: { release },
+	});
+};
+
+export const duplicate = async (
+	req: Request,
+	res: Response,
+) => {
+	const id = req.params.id;
+
+	if (!id || Array.isArray(id)) {
+		return res.status(400).json({
+			success: false,
+			message: 'Music release id is required.',
+		});
+	}
+
+	const release = await duplicateRelease(id);
+
+	res.status(201).json({
+		success: true,
+		data: { release },
 	});
 };
 

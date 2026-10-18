@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowUpRight, Disc3, UsersRound, Video } from 'lucide-react';
+import { ArrowUpRight, Disc3, ListMusic, UsersRound, Video } from 'lucide-react';
 
 export default function AdminPage() {
   return (
@@ -44,6 +44,24 @@ export default function AdminPage() {
           </h2>
           <p className="mt-2 text-sm leading-6 text-black/50">
             Create a single, EP, or album with tracks, artwork, and listening links.
+          </p>
+        </Link>
+
+        <Link
+          href="/admin/music"
+          className="group rounded-[28px] border border-black/[0.07] bg-white p-7 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div className="flex items-start justify-between">
+            <span className="grid size-12 place-items-center rounded-2xl bg-[#f2f0eb]">
+              <ListMusic size={22} />
+            </span>
+            <ArrowUpRight className="text-black/35 transition group-hover:text-black" size={20} />
+          </div>
+          <h2 className="mt-8 text-2xl font-semibold tracking-[-0.04em]">
+            Manage music releases
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-black/50">
+            Review drafts and scheduled releases, search the catalogue, and edit or archive published music.
           </p>
         </Link>
 

@@ -88,7 +88,7 @@ export default function ReleasePage({
 
           <div className="p-7 sm:p-10 lg:p-14">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/35">
-              {release.type} ·{' '}
+              {release.artistName} · {release.type} ·{' '}
               {new Date(
                 release.releaseDate,
               ).getFullYear()}

@@ -3,6 +3,7 @@ import type { Prisma } from '../../generated/prisma/client.js';
 
 import type {
 	CreateReleaseInput,
+	ManagedMusicListQuery,
 	UpdateReleaseInput,
 } from '../schemas/music.schema.js';
 
@@ -25,6 +26,7 @@ export const createRelease = async (
 	return prisma.musicRelease.create({
 		data: {
 			title: input.title,
+			artistName: input.artistName,
 			...(input.description !== undefined
 				? { description: input.description }
 				: {}),
@@ -77,6 +79,9 @@ export const updateRelease = async (
 			data: {
 				...(input.title !== undefined
 					? { title: input.title }
+					: {}),
+				...(input.artistName !== undefined
+					? { artistName: input.artistName }
 					: {}),
 				...(input.description !== undefined
 					? { description: input.description }
@@ -154,6 +159,9 @@ export const getPublishedReleases = async (
 
 	const where = {
 		status: 'PUBLISHED' as const,
+		releaseDate: {
+			lte: new Date(),
+		},
 	};
 
 	const [releases, total] = await prisma.$transaction([
@@ -188,6 +196,9 @@ export const getFeaturedRelease = async () => {
 		where: {
 			status: 'PUBLISHED',
 			isFeatured: true,
+			releaseDate: {
+				lte: new Date(),
+			},
 		},
 		orderBy: {
 			releaseDate: 'desc',
@@ -203,6 +214,9 @@ export const getPublishedReleaseById = async (
 		where: {
 			id: releaseId,
 			status: 'PUBLISHED',
+			releaseDate: {
+				lte: new Date(),
+			},
 		},
 		include: publicReleaseInclude,
 	});
@@ -212,4 +226,109 @@ export const getPublishedReleaseById = async (
 	}
 
 	return release;
+};
+
+export const getManagedReleases = async (
+	query: ManagedMusicListQuery,
+) => {
+	const skip = (query.page - 1) * query.limit;
+	const where: Prisma.MusicReleaseWhereInput = {
+		...(query.status ? { status: query.status } : {}),
+		...(query.type ? { type: query.type } : {}),
+		...(query.search
+			? {
+					OR: [
+						{
+							title: {
+								contains: query.search,
+								mode: 'insensitive',
+							},
+						},
+						{
+							artistName: {
+								contains: query.search,
+								mode: 'insensitive',
+							},
+						},
+					],
+				}
+			: {}),
+		...(query.dateFrom || query.dateTo
+			? {
+					releaseDate: {
+						...(query.dateFrom ? { gte: query.dateFrom } : {}),
+						...(query.dateTo ? { lte: query.dateTo } : {}),
+					},
+				}
+			: {}),
+	};
+
+	const [releases, total] = await prisma.$transaction([
+		prisma.musicRelease.findMany({
+			where,
+			orderBy: {
+				releaseDate: 'desc',
+			},
+			skip,
+			take: query.limit,
+			include: publicReleaseInclude,
+		}),
+		prisma.musicRelease.count({ where }),
+	]);
+
+	return {
+		releases,
+		pagination: {
+			page: query.page,
+			limit: query.limit,
+			total,
+			totalPages: Math.ceil(total / query.limit),
+			hasNextPage: query.page * query.limit < total,
+		},
+	};
+};
+
+export const getManagedReleaseById = async (releaseId: string) => {
+	const release = await prisma.musicRelease.findUnique({
+		where: { id: releaseId },
+		include: publicReleaseInclude,
+	});
+
+	if (!release) {
+		throw new Error('Music release not found');
+	}
+
+	return release;
+};
+
+export const duplicateRelease = async (releaseId: string) => {
+	const release = await getManagedReleaseById(releaseId);
+
+	return prisma.musicRelease.create({
+		data: {
+			title: `${release.title} (Copy)`,
+			artistName: release.artistName,
+			description: release.description,
+			coverUrl: release.coverUrl,
+			releaseDate: release.releaseDate,
+			type: release.type,
+			status: 'DRAFT',
+			isFeatured: false,
+			tracks: {
+				create: release.tracks.map((track) => ({
+					title: track.title,
+					trackNumber: track.trackNumber,
+					durationSeconds: track.durationSeconds,
+					previewUrl: track.previewUrl,
+				})),
+			},
+			links: {
+				create: release.links.map((link) => ({
+					platform: link.platform,
+					url: link.url,
+				})),
+			},
+		},
+		include: publicReleaseInclude,
+	});
 };

@@ -164,6 +164,15 @@ const errorHandler: ErrorRequestHandler = (
     return;
   }
 
+  if (err instanceof Error && err.message === 'Music release not found') {
+    res.status(404).json({
+      success: false,
+      message: err.message,
+    });
+
+    return;
+  }
+
   if (
     err instanceof Error &&
     err.message.startsWith('YouTube metadata request failed')

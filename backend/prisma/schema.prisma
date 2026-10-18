@@ -194,6 +194,7 @@ model SavedPost {
 model MusicRelease {
   id          String        @id @default(uuid())
   title       String
+  artistName  String        @default("Makayla Malaka")
   description String?
   coverUrl    String?
   releaseDate DateTime

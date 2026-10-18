@@ -43,6 +43,13 @@ export const createReleaseSchema = z.object({
 		.min(1)
 		.max(150),
 
+	artistName: z
+		.string()
+		.trim()
+		.min(1)
+		.max(150)
+		.default('Makayla Malaka'),
+
 	description: z
 		.string()
 		.trim()
@@ -103,8 +110,40 @@ export const musicListQuerySchema = z.object({
 		.default(12),
 });
 
+export const managedMusicListQuerySchema = musicListQuerySchema
+	.extend({
+		status: z.enum([
+			'DRAFT',
+			'PUBLISHED',
+			'ARCHIVED',
+		]).optional(),
+
+		type: z.enum([
+			'SINGLE',
+			'EP',
+			'ALBUM',
+		]).optional(),
+
+		search: z.string().trim().max(150).optional(),
+		dateFrom: z.coerce.date().optional(),
+		dateTo: z.coerce.date().optional(),
+	})
+	.refine(
+		(query) =>
+			!query.dateFrom ||
+			!query.dateTo ||
+			query.dateFrom <= query.dateTo,
+		{
+			message: 'The start date must be on or before the end date.',
+			path: ['dateTo'],
+		},
+	);
+
 export type CreateReleaseInput =
 	z.infer<typeof createReleaseSchema>;
 
 export type UpdateReleaseInput =
 	z.infer<typeof updateReleaseSchema>;
+
+export type ManagedMusicListQuery =
+	z.infer<typeof managedMusicListQuerySchema>;

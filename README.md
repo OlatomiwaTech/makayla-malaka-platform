@@ -30,6 +30,8 @@ A personalized overview of what is currently happening around Makayla.
 
 ### Music
 
+Content managers can manage releases at `/admin/music`. The release manager supports drafts, scheduled publication, search by release or artist, status/type/date filters, editing, duplication, and archiving. A published release with a future release date remains hidden from the public catalogue until that time. Artwork previews flag non-square images, images smaller than 1000 × 1000 pixels, unsupported URL file extensions, and broken URLs.
+
 A structured catalog for Makayla's music.
 
 * Singles

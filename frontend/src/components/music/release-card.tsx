@@ -40,7 +40,7 @@ export function ReleaseCard({
           </h3>
 
           <p className="mt-1 text-sm text-black/45">
-            {release.type} ·{' '}
+            {release.artistName} · {release.type} ·{' '}
             {new Date(
               release.releaseDate,
             ).getFullYear()}
