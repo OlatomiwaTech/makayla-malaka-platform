@@ -150,7 +150,7 @@ export const getPublishedPosts = async (
       where: {
         status: 'PUBLISHED',
         publishedAt: {
-          not: null,
+          lte: new Date(),
         },
       },
       orderBy: {
@@ -177,7 +177,7 @@ export const getPublishedPosts = async (
       where: {
         status: 'PUBLISHED',
         publishedAt: {
-          not: null,
+          lte: new Date(),
         },
       },
     }),
@@ -203,7 +203,7 @@ export const getPublishedPostById = async (
       id: postId,
       status: 'PUBLISHED',
       publishedAt: {
-        not: null,
+        lte: new Date(),
       },
     },
     include: {
