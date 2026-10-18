@@ -11,12 +11,15 @@ const videoDurationSeconds = (duration) => {
     const seconds = Number(match[3] ?? 0);
     return hours * 3600 + minutes * 60 + seconds;
 };
-const requestJson = async (url) => {
+const requestJson = async (url, apiKey) => {
     let response;
     try {
         response = await fetch(url, {
             signal: AbortSignal.timeout(8_000),
-            headers: { Accept: 'application/json' },
+            headers: {
+                Accept: 'application/json',
+                'x-goog-api-key': apiKey,
+            },
         });
     }
     catch (error) {
@@ -39,8 +42,7 @@ const metadataFromYouTubeApi = async (videoId, apiKey, approvedChannelId) => {
     const url = new URL('https://www.googleapis.com/youtube/v3/videos');
     url.searchParams.set('part', 'snippet,contentDetails');
     url.searchParams.set('id', videoId);
-    url.searchParams.set('key', apiKey);
-    const result = await requestJson(url);
+    const result = await requestJson(url, apiKey);
     const video = result.items?.[0];
     const snippet = video?.snippet;
     if (!snippet?.channelId) {

@@ -28,6 +28,11 @@ type YouTubeApiVideo = {
   };
 };
 
+type YouTubeApiChannel = { id?: string };
+
+let resolvedOfficialChannel: { handle: string; id: string } | null = null;
+let officialChannelLookup: Promise<string> | null = null;
+
 const videoDurationSeconds = (duration: string | undefined) => {
   if (!duration) return null;
 
@@ -41,13 +46,16 @@ const videoDurationSeconds = (duration: string | undefined) => {
   return hours * 3600 + minutes * 60 + seconds;
 };
 
-const requestJson = async <T>(url: URL): Promise<T> => {
+const requestJson = async <T>(url: URL, apiKey: string): Promise<T> => {
   let response: Response;
 
   try {
     response = await fetch(url, {
       signal: AbortSignal.timeout(8_000),
-      headers: { Accept: 'application/json' },
+      headers: {
+        Accept: 'application/json',
+        'x-goog-api-key': apiKey,
+      },
     });
   } catch (error) {
     if (error instanceof Error && error.name === 'TimeoutError') {
@@ -68,6 +76,37 @@ const requestJson = async <T>(url: URL): Promise<T> => {
   }
 };
 
+const getOfficialChannelId = async (apiKey: string) => {
+  if (env.YOUTUBE_CHANNEL_ID) return env.YOUTUBE_CHANNEL_ID;
+
+  const handle = env.YOUTUBE_CHANNEL_HANDLE;
+  if (resolvedOfficialChannel?.handle === handle) {
+    return resolvedOfficialChannel.id;
+  }
+
+  if (!officialChannelLookup) {
+    const url = new URL('https://www.googleapis.com/youtube/v3/channels');
+    url.searchParams.set('part', 'id');
+    url.searchParams.set('forHandle', handle);
+    officialChannelLookup = requestJson<{ items?: YouTubeApiChannel[] }>(url, apiKey)
+      .then((result) => {
+        const channelId = result.items?.[0]?.id;
+        if (!channelId) {
+          throw new Error('Configured YouTube channel could not be found');
+        }
+
+        resolvedOfficialChannel = { handle, id: channelId };
+        return channelId;
+      })
+      .catch((error: unknown) => {
+        officialChannelLookup = null;
+        throw error;
+      });
+  }
+
+  return officialChannelLookup;
+};
+
 const metadataFromYouTubeApi = async (
   videoId: string,
   apiKey: string,
@@ -76,9 +115,8 @@ const metadataFromYouTubeApi = async (
   const url = new URL('https://www.googleapis.com/youtube/v3/videos');
   url.searchParams.set('part', 'snippet,contentDetails');
   url.searchParams.set('id', videoId);
-  url.searchParams.set('key', apiKey);
 
-  const result = await requestJson<{ items?: YouTubeApiVideo[] }>(url);
+  const result = await requestJson<{ items?: YouTubeApiVideo[] }>(url, apiKey);
   const video = result.items?.[0];
   const snippet = video?.snippet;
 
@@ -131,11 +169,11 @@ export const getYouTubeVideoMetadata = async (
   }
 
   const apiKey = env.YOUTUBE_API_KEY;
-  const approvedChannelId = env.YOUTUBE_CHANNEL_ID;
 
-  if (!apiKey || !approvedChannelId) {
+  if (!apiKey) {
     throw new Error('YouTube channel verification is not configured');
   }
 
+  const approvedChannelId = await getOfficialChannelId(apiKey);
   return metadataFromYouTubeApi(videoId, apiKey, approvedChannelId);
 };
