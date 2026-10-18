@@ -30,7 +30,7 @@ export function MusicSpotlight() {
             </p>
 
             <h3 className="mt-3 max-w-xl text-3xl font-semibold tracking-[-0.04em]">
-              Discover Makayla's music, releases and collaborations.
+              Discover Makayla&apos;s music, releases and collaborations.
             </h3>
 
             <p className="mt-4 max-w-xl text-sm leading-6 text-black/50">

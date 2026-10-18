@@ -30,7 +30,7 @@ export function EventSpotlight() {
         </h3>
 
         <p className="mt-3 max-w-lg text-sm leading-6 text-black/50">
-          When a new event is announced, you'll find all the details here.
+          When a new event is announced, you&apos;ll find all the details here.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-4 text-sm text-black/45">

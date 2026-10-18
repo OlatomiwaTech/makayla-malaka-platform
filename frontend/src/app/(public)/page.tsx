@@ -43,7 +43,7 @@ export default function HomePage() {
             <div className="mt-4 flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
               <div className="max-w-2xl">
                 <h2 className="text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-                  Keep up with what's happening in Makayla's world.
+                    Keep up with what&apos;s happening in Makayla&apos;s world.
                 </h2>
 
                 <p className="mt-4 text-sm leading-6 text-white/50">

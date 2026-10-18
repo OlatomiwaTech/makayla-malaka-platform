@@ -1,4 +1,5 @@
 import { prisma } from '../lib/prisma.js';
+import type { Prisma } from '../../generated/prisma/client.js';
 
 import type {
 	CreateReleaseInput,
@@ -68,7 +69,7 @@ export const updateRelease = async (
 		throw new Error('Music release not found');
 	}
 
-	return prisma.$transaction(async (tx: typeof prisma) => {
+	return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
 		await tx.musicRelease.update({
 			where: {
 				id: releaseId,

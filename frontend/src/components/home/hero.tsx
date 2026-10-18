@@ -8,7 +8,7 @@ type HeroProps = {
 
 export function Hero({
   title = 'Makayla Malaka',
-  description = "Music, moments, events and everything happening in Makayla's world.",
+  description = "Music, moments, events and everything happening in Makayla&apos;s world.",
 }: HeroProps) {
   return (
     <section className="overflow-hidden rounded-[32px] bg-[#171717] text-white">
@@ -54,7 +54,7 @@ export function Hero({
           </div>
 
           <div className="flex items-center justify-between border-t border-white/10 pt-5 text-xs text-white/40">
-            <span>Makayla's official platform</span>
+            <span>Makayla&apos;s official platform</span>
             <span>2026</span>
           </div>
         </div>

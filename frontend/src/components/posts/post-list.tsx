@@ -29,7 +29,7 @@ export function PostList() {
 	if (isError) {
 		return (
 			<div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-sm text-red-700">
-				We couldn't load Makayla's latest updates.
+				We couldn&apos;t load Makayla&apos;s latest updates.
 			</div>
 		);
 	}
@@ -42,7 +42,7 @@ export function PostList() {
 				</p>
 
 				<p className="mt-2 text-sm text-zinc-500">
-					Check back soon for Makayla's latest updates.
+					Check back soon for Makayla&apos;s latest updates.
 				</p>
 			</div>
 		);

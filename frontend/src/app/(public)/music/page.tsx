@@ -40,7 +40,7 @@ export default function MusicPage() {
           </h1>
 
           <p className="mt-5 max-w-2xl text-base leading-7 text-black/50 sm:text-lg">
-            Explore Makayla's releases, tracks,
+            Explore Makayla&apos;s releases, tracks,
             collaborations and the music behind the
             moments.
           </p>
@@ -126,7 +126,7 @@ export default function MusicPage() {
 
           {isError && (
             <div className="rounded-[26px] border border-red-200 bg-red-50 p-6 text-sm text-red-700">
-              We couldn't load the music catalog.
+              We couldn&apos;t load the music catalog.
             </div>
           )}
 

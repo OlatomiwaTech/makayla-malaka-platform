@@ -105,7 +105,7 @@ export default function NewVideoPage() {
         </h1>
 
         <p className="mt-3 text-sm leading-6 text-black/50">
-          Add a video from Makayla's YouTube
+          Add a video from Makayla&apos;s YouTube
           channel to the platform.
         </p>
       </div>

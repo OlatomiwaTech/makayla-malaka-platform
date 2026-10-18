@@ -82,7 +82,7 @@ export default function VideosPage() {
 
           {isError && (
             <div className="rounded-[26px] bg-red-50 p-6 text-sm text-red-700">
-              We couldn't load the videos.
+              We couldn&apos;t load the videos.
             </div>
           )}
 
