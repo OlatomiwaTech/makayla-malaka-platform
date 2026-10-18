@@ -9,6 +9,10 @@ import type {
   CreateVideoInput,
   UpdateVideoInput,
 } from '../schemas/video.schema.js';
+import { getYouTubeVideoMetadata } from './youtube-metadata.service.js';
+
+export const previewVideo = (url: string) =>
+  getYouTubeVideoMetadata(url);
 
 export const createVideo = async (
   input: CreateVideoInput,
@@ -19,6 +23,8 @@ export const createVideo = async (
   if (!youtubeVideoId) {
     throw new Error('Invalid YouTube video URL');
   }
+
+  const metadata = await getYouTubeVideoMetadata(input.youtubeUrl);
 
   const existingVideo = await prisma.video.findUnique({
     where: {
@@ -35,13 +41,16 @@ export const createVideo = async (
   return prisma.video.create({
     data: {
       youtubeVideoId,
-      title: input.title,
-      ...(input.description !== undefined
-        ? { description: input.description }
-        : {}),
+      title: input.title || metadata.title,
+      description: input.description?.trim() || metadata.description,
       thumbnailUrl:
         input.thumbnailUrl ??
+        metadata.thumbnailUrl ??
         getYouTubeThumbnailUrl(youtubeVideoId),
+      channelTitle: metadata.channelTitle,
+      sourcePublishedAt: metadata.sourcePublishedAt,
+      durationSeconds: metadata.durationSeconds,
+      youtubeCategoryId: metadata.categoryId,
       videoUrl: getYouTubeEmbedUrl(youtubeVideoId),
       category: input.category,
       status: input.status,
@@ -66,6 +75,7 @@ export const updateVideo = async (
   }
 
   let youtubeVideoId = existingVideo.youtubeVideoId;
+  let metadata: Awaited<ReturnType<typeof getYouTubeVideoMetadata>> | null = null;
 
   if (input.youtubeUrl) {
     const extractedId = extractYouTubeVideoId(
@@ -75,6 +85,8 @@ export const updateVideo = async (
     if (!extractedId) {
       throw new Error('Invalid YouTube video URL');
     }
+
+    metadata = await getYouTubeVideoMetadata(input.youtubeUrl);
 
     youtubeVideoId = extractedId;
 
@@ -117,12 +129,19 @@ export const updateVideo = async (
       ...(input.description !== undefined
         ? { description: input.description }
         : {}),
+      ...(metadata
+        ? {
+            channelTitle: metadata.channelTitle,
+            sourcePublishedAt: metadata.sourcePublishedAt,
+            durationSeconds: metadata.durationSeconds,
+            youtubeCategoryId: metadata.categoryId,
+          }
+        : {}),
       ...(input.thumbnailUrl !== undefined
         ? { thumbnailUrl: input.thumbnailUrl }
-        : input.youtubeUrl
+        : metadata
           ? {
-              thumbnailUrl:
-                getYouTubeThumbnailUrl(youtubeVideoId),
+              thumbnailUrl: metadata.thumbnailUrl,
             }
         : {}),
       ...(input.category !== undefined

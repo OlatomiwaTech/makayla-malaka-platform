@@ -26,6 +26,16 @@ export const extractYouTubeVideoId = (
       }
     }
 
+    if (hostname === 'm.youtube.com') {
+      if (url.pathname === '/watch') {
+        videoId = url.searchParams.get('v');
+      } else if (url.pathname.startsWith('/shorts/')) {
+        videoId = url.pathname.split('/')[2] ?? null;
+      } else if (url.pathname.startsWith('/embed/')) {
+        videoId = url.pathname.split('/')[2] ?? null;
+      }
+    }
+
     if (
       !videoId ||
       videoId.length !== YOUTUBE_VIDEO_ID_LENGTH ||

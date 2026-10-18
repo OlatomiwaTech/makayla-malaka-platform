@@ -4,6 +4,7 @@ import {
   createVideo,
   getPublishedVideoById,
   getPublishedVideos,
+  previewVideo,
   updateVideo,
 } from './video.service.js';
 
@@ -11,14 +12,22 @@ import {
   createVideoSchema,
   updateVideoSchema,
   videoListQuerySchema,
+  videoPreviewQuerySchema,
 } from '../schemas/video.schema.js';
+
+export const preview = async (req: Request, res: Response) => {
+  const query = videoPreviewQuerySchema.parse(req.query);
+  const metadata = await previewVideo(query.url);
+  res.status(200).json({
+    success: true,
+    data: { video: metadata },
+  });
+};
 
 export const create = async (
   req: Request,
   res: Response,
 ) => {
-  console.log('VIDEO REQUEST BODY:', req.body);
-
   const input = createVideoSchema.parse(req.body);
 
   const video = await createVideo(input);

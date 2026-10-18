@@ -4,6 +4,7 @@ import {
   create,
   getOne,
   list,
+  preview,
   update,
 } from '../videos/video.controller.js';
 
@@ -14,6 +15,13 @@ import { asyncHandler } from '../middleware/async-handler.js';
 const router = Router();
 
 router.get('/', asyncHandler(list));
+
+router.get(
+  '/preview',
+  requireAuth,
+  requireRole('MEDIA_EDITOR', 'EDITOR', 'ADMIN'),
+  asyncHandler(preview),
+);
 
 router.get(
   '/:id',

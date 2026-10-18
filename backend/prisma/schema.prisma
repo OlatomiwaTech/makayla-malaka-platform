@@ -247,6 +247,10 @@ model Video {
   category    String
   status      VideoStatus @default(DRAFT)
   publishedAt DateTime?
+  sourcePublishedAt DateTime?
+  durationSeconds Int?
+  channelTitle String?
+  youtubeCategoryId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -101,6 +101,10 @@ export const videoListQuerySchema = z.object({
     .optional(),
 });
 
+export const videoPreviewQuerySchema = z.object({
+  url: youtubeUrlSchema,
+});
+
 export type CreateVideoInput =
   z.infer<typeof createVideoSchema>;
 
