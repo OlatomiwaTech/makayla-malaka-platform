@@ -18,6 +18,11 @@ const envSchema = z.object({
         .min(32, 'ADMIN_SETUP_KEY must be at least 32 characters')
         .optional(),
     YOUTUBE_API_KEY: z.string().trim().min(1).optional(),
+    YOUTUBE_CHANNEL_ID: z
+        .string()
+        .trim()
+        .regex(/^UC[A-Za-z0-9_-]{22}$/, 'YOUTUBE_CHANNEL_ID must be a YouTube channel ID')
+        .optional(),
 });
 const parsedEnv = envSchema.safeParse(process.env);
 if (!parsedEnv.success) {

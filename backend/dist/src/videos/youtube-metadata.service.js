@@ -35,7 +35,7 @@ const requestJson = async (url) => {
         throw new Error('YouTube metadata service returned an invalid response');
     }
 };
-const metadataFromYouTubeApi = async (videoId, apiKey) => {
+const metadataFromYouTubeApi = async (videoId, apiKey, approvedChannelId) => {
     const url = new URL('https://www.googleapis.com/youtube/v3/videos');
     url.searchParams.set('part', 'snippet,contentDetails');
     url.searchParams.set('id', videoId);
@@ -43,6 +43,12 @@ const metadataFromYouTubeApi = async (videoId, apiKey) => {
     const result = await requestJson(url);
     const video = result.items?.[0];
     const snippet = video?.snippet;
+    if (!snippet?.channelId) {
+        throw new Error('Could not verify the YouTube channel for this video');
+    }
+    if (snippet.channelId !== approvedChannelId) {
+        throw new Error('This video is not from Makayla’s official YouTube channel');
+    }
     if (!snippet?.title) {
         throw new Error('YouTube video was not found or is not publicly available');
     }
@@ -70,35 +76,16 @@ const metadataFromYouTubeApi = async (videoId, apiKey) => {
         metadataSource: 'youtube-data-api',
     };
 };
-const metadataFromOEmbed = async (videoId, originalUrl) => {
-    const url = new URL('https://www.youtube.com/oembed');
-    url.searchParams.set('url', originalUrl);
-    url.searchParams.set('format', 'json');
-    const result = await requestJson(url);
-    if (!result.title) {
-        throw new Error('YouTube video was not found or is not publicly available');
-    }
-    return {
-        videoId,
-        title: result.title,
-        description: null,
-        thumbnailUrl: result.thumbnail_url ?? getYouTubeThumbnailUrl(videoId),
-        channelTitle: result.author_name ?? null,
-        sourcePublishedAt: null,
-        durationSeconds: null,
-        categoryId: null,
-        metadataSource: 'youtube-oembed',
-    };
-};
 export const getYouTubeVideoMetadata = async (value) => {
     const videoId = extractYouTubeVideoId(value);
     if (!videoId) {
         throw new Error('Invalid YouTube video URL');
     }
     const apiKey = env.YOUTUBE_API_KEY;
-    if (apiKey) {
-        return metadataFromYouTubeApi(videoId, apiKey);
+    const approvedChannelId = env.YOUTUBE_CHANNEL_ID;
+    if (!apiKey || !approvedChannelId) {
+        throw new Error('YouTube channel verification is not configured');
     }
-    return metadataFromOEmbed(videoId, `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`);
+    return metadataFromYouTubeApi(videoId, apiKey, approvedChannelId);
 };
 //# sourceMappingURL=youtube-metadata.service.js.map
