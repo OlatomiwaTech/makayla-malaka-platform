@@ -47,12 +47,12 @@ export function Hero({ latestVideoHref }: HeroProps) {
       <div className="relative order-1 min-h-[300px] overflow-hidden bg-[#0b0b0d] sm:min-h-[400px] lg:order-2 lg:min-h-full">
         <div className="absolute inset-y-0 left-0 z-20 w-1.5 bg-[#ed1689]" />
         <Image
-          src="/makayla-image.jpg"
-          alt="Makayla Malaka smiling"
+          src="/makyla.png"
+          alt="Makayla Malaka performing live"
           fill
           priority
           sizes="(max-width: 1024px) 100vw, 45vw"
-          className="relative z-10 object-contain object-bottom px-4 pt-8 sm:px-8 sm:pt-10"
+          className="relative z-10 object-cover object-center"
         />
         <div className="absolute bottom-5 left-5 z-20 border-l-2 border-[#ed1689] bg-black/80 px-4 py-3 text-white sm:bottom-8 sm:left-8 sm:px-5 sm:py-4">
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff71bb]">Making memories</p>
