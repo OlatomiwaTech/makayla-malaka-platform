@@ -19,6 +19,12 @@ export const createRelease = async (input) => {
             ...(input.description !== undefined
                 ? { description: input.description }
                 : {}),
+            ...(input.seoTitle !== undefined
+                ? { seoTitle: input.seoTitle || null }
+                : {}),
+            ...(input.seoDescription !== undefined
+                ? { seoDescription: input.seoDescription || null }
+                : {}),
             ...(input.coverUrl !== undefined
                 ? { coverUrl: input.coverUrl }
                 : {}),
@@ -68,6 +74,12 @@ export const updateRelease = async (releaseId, input) => {
                     : {}),
                 ...(input.description !== undefined
                     ? { description: input.description }
+                    : {}),
+                ...(input.seoTitle !== undefined
+                    ? { seoTitle: input.seoTitle || null }
+                    : {}),
+                ...(input.seoDescription !== undefined
+                    ? { seoDescription: input.seoDescription || null }
                     : {}),
                 ...(input.coverUrl !== undefined
                     ? { coverUrl: input.coverUrl }
@@ -264,6 +276,8 @@ export const duplicateRelease = async (releaseId) => {
             title: `${release.title.slice(0, 143)} (Copy)`,
             artistName: release.artistName,
             description: release.description,
+            seoTitle: release.seoTitle,
+            seoDescription: release.seoDescription,
             coverUrl: release.coverUrl,
             releaseDate: release.releaseDate,
             type: release.type,

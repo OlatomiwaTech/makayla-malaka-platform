@@ -196,6 +196,8 @@ model MusicRelease {
   title       String
   artistName  String        @default("Makayla Malaka")
   description String?
+  seoTitle    String?
+  seoDescription String?
   coverUrl    String?
   releaseDate DateTime
   type        ReleaseType
@@ -243,6 +245,8 @@ model Video {
   youtubeVideoId String   @unique
   title       String
   description String?
+  seoTitle    String?
+  seoDescription String?
   thumbnailUrl String?
   videoUrl    String
   category    String

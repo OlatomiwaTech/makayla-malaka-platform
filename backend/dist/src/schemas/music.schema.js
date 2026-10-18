@@ -62,6 +62,8 @@ export const createReleaseSchema = z.object({
         .trim()
         .max(5000)
         .optional(),
+    seoTitle: z.string().trim().max(70).optional(),
+    seoDescription: z.string().trim().max(320).optional(),
     coverUrl: z
         .string()
         .url()

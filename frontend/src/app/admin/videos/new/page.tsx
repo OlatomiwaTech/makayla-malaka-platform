@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { api } from '@/lib/api';
@@ -26,6 +26,10 @@ const formSchema = z.object({
     .string()
     .max(5000)
     .optional(),
+
+  seoTitle: z.string().trim().max(70, 'SEO titles must be 70 characters or fewer'),
+
+  seoDescription: z.string().trim().max(320, 'SEO descriptions must be 320 characters or fewer'),
 
   thumbnailUrl: z
     .string()
@@ -93,6 +97,7 @@ export default function NewVideoPage() {
 
   const {
     register,
+    control,
     getValues,
     setValue,
     handleSubmit,
@@ -107,9 +112,17 @@ export default function NewVideoPage() {
     defaultValues: {
       status: 'DRAFT',
       thumbnailUrl: '',
+      seoTitle: '',
+      seoDescription: '',
     },
   });
   const youtubeUrlField = register('youtubeUrl');
+  const seoTitleField = register('seoTitle');
+  const seoDescriptionField = register('seoDescription');
+  const seoTitle = useWatch({ control, name: 'seoTitle' });
+  const seoDescription = useWatch({ control, name: 'seoDescription' });
+  const title = useWatch({ control, name: 'title' });
+  const description = useWatch({ control, name: 'description' });
 
   const analyzeUrl = async () => {
     const youtubeUrl = getValues('youtubeUrl').trim();
@@ -328,6 +341,34 @@ export default function NewVideoPage() {
             </p>
           )}
         </div>
+
+        <section className="space-y-4 rounded-2xl border border-black/[0.07] p-4">
+          <div>
+            <h2 className="font-semibold">Search and social preview</h2>
+            <p className="mt-1 text-sm text-black/50">Optional overrides for search results and link previews. Leave blank to generate them from the video title and description.</p>
+          </div>
+          <div>
+            <div className="flex items-center justify-between gap-4">
+              <label htmlFor="seoTitle" className="text-sm font-medium">SEO title</label>
+              <span className="text-xs text-black/40">{seoTitle.length}/70</span>
+            </div>
+            <input {...seoTitleField} id="seoTitle" maxLength={70} placeholder="Defaults to the video title" className="mt-2 w-full rounded-2xl border border-black/10 px-4 py-3 outline-none focus:border-black" />
+            {errors.seoTitle && <p className="mt-2 text-sm text-red-600">{errors.seoTitle.message}</p>}
+          </div>
+          <div>
+            <div className="flex items-center justify-between gap-4">
+              <label htmlFor="seoDescription" className="text-sm font-medium">SEO description</label>
+              <span className="text-xs text-black/40">{seoDescription.length}/320</span>
+            </div>
+            <textarea {...seoDescriptionField} id="seoDescription" maxLength={320} rows={3} placeholder="Summarize the video for search and social previews" className="mt-2 w-full resize-y rounded-2xl border border-black/10 px-4 py-3 outline-none focus:border-black" />
+            {errors.seoDescription && <p className="mt-2 text-sm text-red-600">{errors.seoDescription.message}</p>}
+          </div>
+          <div className="rounded-xl bg-[#f7f5f1] p-4">
+            <p className="text-xs text-[#1a5dab]">{seoTitle || `${title || 'Video title'} | Makayla Malaka`}</p>
+            <p className="mt-1 text-xs text-green-800">Your website › videos › video</p>
+            <p className="mt-1 text-sm text-black/60">{seoDescription || description || 'Video description will appear in the search and social preview.'}</p>
+          </div>
+        </section>
 
         <div>
           <label className="text-sm font-medium">

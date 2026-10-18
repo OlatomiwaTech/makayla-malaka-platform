@@ -17,6 +17,8 @@ export const createVideoSchema = z.object({
         .trim()
         .max(5000)
         .optional(),
+    seoTitle: z.string().trim().max(70).optional(),
+    seoDescription: z.string().trim().max(320).optional(),
     thumbnailUrl: z
         .string()
         .trim()
@@ -48,6 +50,8 @@ export const updateVideoSchema = z.object({
         .trim()
         .max(5000)
         .optional(),
+    seoTitle: z.string().trim().max(70).optional(),
+    seoDescription: z.string().trim().max(320).optional(),
     category: z
         .string()
         .trim()

@@ -21,6 +21,8 @@ export const createVideo = async (input) => {
             youtubeVideoId,
             title: input.title || metadata.title,
             description: input.description?.trim() || metadata.description,
+            seoTitle: input.seoTitle || null,
+            seoDescription: input.seoDescription || null,
             thumbnailUrl: input.thumbnailUrl ??
                 metadata.thumbnailUrl ??
                 getYouTubeThumbnailUrl(youtubeVideoId),
@@ -82,6 +84,12 @@ export const updateVideo = async (videoId, input) => {
                 : {}),
             ...(input.description !== undefined
                 ? { description: input.description }
+                : {}),
+            ...(input.seoTitle !== undefined
+                ? { seoTitle: input.seoTitle || null }
+                : {}),
+            ...(input.seoDescription !== undefined
+                ? { seoDescription: input.seoDescription || null }
                 : {}),
             ...(metadata
                 ? {

@@ -27,6 +27,8 @@ export type MusicRelease = {
   title: string;
   artistName: string;
   description: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
   coverUrl: string | null;
   releaseDate: string;
   type: ReleaseType;

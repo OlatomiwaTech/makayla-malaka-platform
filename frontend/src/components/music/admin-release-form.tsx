@@ -41,6 +41,8 @@ const formSchema = z.object({
   title: z.string().trim().min(1, 'Release title is required').max(150),
   artistName: z.string().trim().min(1, 'Artist is required').max(150),
   description: z.string().trim().max(5000),
+  seoTitle: z.string().trim().max(70, 'SEO titles must be 70 characters or fewer'),
+  seoDescription: z.string().trim().max(320, 'SEO descriptions must be 320 characters or fewer'),
   coverUrl: optionalUrlSchema,
   releaseDate: z.string().min(1, 'Release date is required').refine(
     (value) => !Number.isNaN(Date.parse(value)),
@@ -62,6 +64,8 @@ const initialValues: FormData = {
   title: '',
   artistName: 'Makayla Malaka',
   description: '',
+  seoTitle: '',
+  seoDescription: '',
   coverUrl: '',
   releaseDate: '',
   type: 'SINGLE',
@@ -84,6 +88,8 @@ const toFormValues = (release: MusicRelease): FormData => ({
   title: release.title,
   artistName: release.artistName,
   description: release.description ?? '',
+  seoTitle: release.seoTitle ?? '',
+  seoDescription: release.seoDescription ?? '',
   coverUrl: release.coverUrl ?? '',
   releaseDate: toLocalDateTime(release.releaseDate),
   type: release.type,
@@ -139,6 +145,8 @@ export function AdminMusicReleaseForm({
   const links = useWatch({ control, name: 'links' });
   const status = useWatch({ control, name: 'status' });
   const releaseType = useWatch({ control, name: 'type' });
+  const seoTitle = useWatch({ control, name: 'seoTitle' });
+  const seoDescription = useWatch({ control, name: 'seoDescription' });
 
   const onSubmit = async (formData: FormData) => {
     setServerError(null);
@@ -148,6 +156,8 @@ export function AdminMusicReleaseForm({
       ...formData,
       releaseDate: new Date(formData.releaseDate).toISOString(),
       description: formData.description || undefined,
+      seoTitle: formData.seoTitle || undefined,
+      seoDescription: formData.seoDescription || undefined,
       coverUrl: formData.coverUrl || undefined,
       tracks: formData.tracks.map((track) => ({
         ...track,
@@ -295,6 +305,36 @@ export function AdminMusicReleaseForm({
             <label htmlFor="description" className="text-sm font-medium">Description <span className="text-black/40">(optional)</span></label>
             <textarea {...register('description')} id="description" rows={4} className={`${inputClass} resize-y`} placeholder="About this release..." />
             {errors.description && <p className="mt-2 text-sm text-red-600">{errors.description.message}</p>}
+          </div>
+        </section>
+
+        <section className="border-t border-black/[0.07] pt-7">
+          <div>
+            <h2 className="text-xl font-semibold tracking-[-0.03em]">Search and social preview</h2>
+            <p className="mt-1 text-sm text-black/45">Optional overrides for search results and link previews. Leave blank to generate them from the release title, artist, and description.</p>
+          </div>
+          <div className="mt-5 space-y-4">
+            <div>
+              <div className="flex items-center justify-between gap-4">
+                <label htmlFor="seoTitle" className="text-sm font-medium">SEO title <span className="text-black/40">(optional)</span></label>
+                <span className="text-xs text-black/40">{seoTitle.length}/70</span>
+              </div>
+              <input {...register('seoTitle')} id="seoTitle" maxLength={70} className={inputClass} placeholder="Defaults to the release title and artist" />
+              {errors.seoTitle && <p className="mt-2 text-sm text-red-600">{errors.seoTitle.message}</p>}
+            </div>
+            <div>
+              <div className="flex items-center justify-between gap-4">
+                <label htmlFor="seoDescription" className="text-sm font-medium">SEO description <span className="text-black/40">(optional)</span></label>
+                <span className="text-xs text-black/40">{seoDescription.length}/320</span>
+              </div>
+              <textarea {...register('seoDescription')} id="seoDescription" maxLength={320} rows={3} className={`${inputClass} resize-y`} placeholder="Summarize this release for search and social previews" />
+              {errors.seoDescription && <p className="mt-2 text-sm text-red-600">{errors.seoDescription.message}</p>}
+            </div>
+            <div className="rounded-2xl border border-black/[0.07] p-4">
+              <p className="text-xs text-[#1a5dab]">{seoTitle || `${title || 'Release title'} by ${artistName || 'Makayla Malaka'}`} | Makayla Malaka</p>
+              <p className="mt-1 text-xs text-green-800">Your website › music › {release?.id ?? 'release'}</p>
+              <p className="mt-1 text-sm text-black/60">{seoDescription || description || `Listen to ${title || 'this release'} by ${artistName || 'Makayla Malaka'} and explore the tracklist and streaming links.`}</p>
+            </div>
           </div>
         </section>
 

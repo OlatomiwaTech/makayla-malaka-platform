@@ -3,6 +3,8 @@ export type Video = {
   youtubeVideoId: string;
   title: string;
   description: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
   thumbnailUrl: string | null;
   category: string;
   channelTitle: string | null;

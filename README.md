@@ -240,6 +240,12 @@ npx prisma migrate deploy
 
 This creates or updates the tables in the Neon database without deleting existing data.
 
+## Search engine optimization
+
+Configure `NEXT_PUBLIC_SITE_URL` in `frontend/.env.local` to the canonical public origin of the deployed website (for example, `https://www.example.com`). This value is used for canonical links, Open Graph URLs, JSON-LD, `robots.txt`, and `sitemap.xml`; keep it set to the same HTTPS host users should see in search results. `NEXT_PUBLIC_API_URL` should point to the backend API and is used to include published music and videos in the sitemap.
+
+Public pages include canonical URLs, Open Graph/Twitter previews, and Schema.org structured data for the artist website, music collections/releases, and YouTube videos. The sitemap refreshes hourly and includes published catalogue items; admin pages are excluded from indexing. Release and video editors can set optional SEO title and description overrides; by default the page metadata is generated from the content. Google and Bing site-verification tokens can optionally be set as `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` in the frontend environment.
+
 ### Owner and content-manager accounts
 
 Set a private random `ADMIN_SETUP_KEY` of at least 32 characters in `backend/.env` before starting the backend. Open `/admin/setup` and use that key to create the first owner account; this endpoint is disabled after an admin exists. New registrations are regular accounts by default. The owner can grant or revoke the `MEDIA_EDITOR` role at `/admin/accounts`; media editors can manage music and videos but cannot manage posts, accounts, or admin permissions.

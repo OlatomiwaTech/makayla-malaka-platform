@@ -1,109 +1,101 @@
-'use client';
+import type { Metadata } from 'next';
 
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { use } from 'react';
-
-import { api } from '@/lib/api';
-import { YouTubePlayer } from '@/components/videos/youtube-player';
-
-import type { Video } from '@/types/video';
-
-type VideoResponse = {
-  success: boolean;
-  data: {
-    video: Video;
-  };
-};
+import VideoDetailClient from './video-detail-client';
+import {
+  canonicalUrl,
+  descriptionForSeo,
+  getPublicVideoForSeo,
+  isoDuration,
+  jsonLd,
+} from '@/lib/seo';
 
 type Props = {
-  params: Promise<{
-    id: string;
-  }>;
+  params: Promise<{ id: string }>;
 };
 
-export default function VideoDetailPage({
-  params,
-}: Props) {
-  const { id } = use(params);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const video = await getPublicVideoForSeo(id);
 
-  const query = useQuery({
-    queryKey: ['video-detail', id],
-    queryFn: () => api<VideoResponse>(`/videos/${id}`),
-  });
-
-  if (query.isLoading) {
-    return (
-      <main className="mx-auto max-w-6xl px-4 py-12">
-        <div className="aspect-video animate-pulse rounded-[30px] bg-black/5" />
-      </main>
-    );
+  if (!video) {
+    return {
+      title: 'Video',
+      description: 'Watch official videos from Makayla Malaka.',
+      robots: { index: false, follow: false },
+      alternates: { canonical: canonicalUrl(`/videos/${id}`) },
+    };
   }
 
-  if (query.isError || !query.data) {
-    return (
-      <main className="mx-auto max-w-2xl px-4 py-20 text-center">
-        <h1 className="text-2xl font-semibold">
-          Video not found
-        </h1>
+  const title = video.seoTitle?.trim() || video.title;
+  const description = descriptionForSeo(
+    video.seoDescription,
+    video.description || `Watch ${video.title} by Makayla Malaka.`,
+  );
+  const url = canonicalUrl(`/videos/${video.id}`);
+  const image = video.thumbnailUrl || '/Logo.png';
 
-        <Link
-          href="/videos"
-          className="mt-4 inline-block text-sm font-medium"
-        >
-          Back to videos
-        </Link>
-      </main>
-    );
-  }
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'video.other',
+      url,
+      title,
+      description,
+      siteName: 'Makayla Malaka',
+      images: [{ url: image, alt: `${video.title} video thumbnail` }],
+      videos: [{ url: `https://www.youtube.com/embed/${video.youtubeVideoId}` }],
+    },
+    twitter: {
+      card: 'player',
+      title,
+      description,
+      images: [image],
+      players: {
+        playerUrl: `https://www.youtube.com/embed/${video.youtubeVideoId}`,
+        width: 1280,
+        height: 720,
+      },
+    },
+  };
+}
 
-  const video = query.data.data.video;
+export default async function VideoPage({ params }: Props) {
+  const { id } = await params;
+  const video = await getPublicVideoForSeo(id);
+  const structuredData = video
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'VideoObject',
+        name: video.title,
+        description: descriptionForSeo(video.description, `Watch ${video.title} by Makayla Malaka.`),
+        thumbnailUrl: video.thumbnailUrl
+          ? [video.thumbnailUrl]
+          : [`https://i.ytimg.com/vi/${video.youtubeVideoId}/hqdefault.jpg`],
+        embedUrl: `https://www.youtube.com/embed/${video.youtubeVideoId}`,
+        ...(video.sourcePublishedAt || video.publishedAt
+          ? { uploadDate: video.sourcePublishedAt || video.publishedAt }
+          : {}),
+        ...(video.durationSeconds
+          ? { duration: isoDuration(video.durationSeconds) }
+          : {}),
+        ...(video.channelTitle
+          ? { publisher: { '@type': 'Organization', name: video.channelTitle } }
+          : {}),
+        url: canonicalUrl(`/videos/${video.id}`),
+      }
+    : null;
 
   return (
-    <div className="bg-[#f7f5f1]">
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-        <Link
-          href="/videos"
-          className="inline-flex items-center gap-2 text-sm font-medium text-black/50 hover:text-black"
-        >
-          <ArrowLeft size={16} />
-          Back to videos
-        </Link>
-
-        <div className="mt-8">
-          <YouTubePlayer
-            videoId={video.youtubeVideoId}
-            title={video.title}
-          />
-        </div>
-
-        <div className="mt-8 max-w-4xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-black/35">
-            {video.category}
-            {video.channelTitle ? ` · ${video.channelTitle}` : ''}
-            {video.durationSeconds !== null
-              ? ` · ${Math.floor(video.durationSeconds / 60)}:${String(video.durationSeconds % 60).padStart(2, '0')}`
-              : ''}
-          </p>
-
-          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
-            {video.title}
-          </h1>
-
-          {video.sourcePublishedAt && (
-            <p className="mt-3 text-sm text-black/45">
-              Published on YouTube {new Date(video.sourcePublishedAt).toLocaleDateString()}
-            </p>
-          )}
-
-          {video.description && (
-            <p className="mt-5 text-base leading-7 text-black/55">
-              {video.description}
-            </p>
-          )}
-        </div>
-      </main>
-    </div>
+    <>
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={jsonLd(structuredData)}
+        />
+      )}
+      <VideoDetailClient id={id} initialVideo={video ?? undefined} />
+    </>
   );
 }
