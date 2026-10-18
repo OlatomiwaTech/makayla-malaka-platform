@@ -5,6 +5,10 @@ export type Video = {
   description: string | null;
   thumbnailUrl: string | null;
   category: string;
+  channelTitle: string | null;
+  sourcePublishedAt: string | null;
+  durationSeconds: number | null;
+  youtubeCategoryId: string | null;
   status:
     | 'DRAFT'
     | 'PUBLISHED'

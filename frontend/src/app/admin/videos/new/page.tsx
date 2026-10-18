@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -27,6 +27,13 @@ const formSchema = z.object({
     .max(5000)
     .optional(),
 
+  thumbnailUrl: z
+    .string()
+    .trim()
+    .url('Enter a valid thumbnail URL')
+    .optional()
+    .or(z.literal('')),
+
   category: z
     .string()
     .trim()
@@ -44,14 +51,49 @@ type FormData = z.infer<
   typeof formSchema
 >;
 
+type VideoPreview = {
+  videoId: string;
+  title: string;
+  description: string | null;
+  thumbnailUrl: string;
+  channelTitle: string | null;
+  sourcePublishedAt: string | null;
+  durationSeconds: number | null;
+  categoryId: string | null;
+  metadataSource: 'youtube-data-api' | 'youtube-oembed';
+};
+
+type PreviewResponse = {
+  success: boolean;
+  data: { video: VideoPreview };
+};
+
+const formatDuration = (durationSeconds: number) => {
+  const hours = Math.floor(durationSeconds / 3600);
+  const minutes = Math.floor((durationSeconds % 3600) / 60);
+  const seconds = durationSeconds % 60;
+
+  return hours > 0
+    ? `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    : `${minutes}:${String(seconds).padStart(2, '0')}`;
+};
+
 export default function NewVideoPage() {
   const router = useRouter();
+  const [preview, setPreview] = useState<VideoPreview | null>(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const lastAnalyzedUrl = useRef<string | null>(null);
+  const lastAutoTitle = useRef<string | null>(null);
+  const lastAutoDescription = useRef<string | null>(null);
 
   const [serverError, setServerError] =
     useState<string | null>(null);
 
   const {
     register,
+    getValues,
+    setValue,
     handleSubmit,
     formState: {
       errors,
@@ -63,8 +105,55 @@ export default function NewVideoPage() {
 
     defaultValues: {
       status: 'DRAFT',
+      thumbnailUrl: '',
     },
   });
+
+  const analyzeUrl = async () => {
+    const youtubeUrl = getValues('youtubeUrl').trim();
+    if (!youtubeUrl) return;
+    if (lastAnalyzedUrl.current === youtubeUrl && preview) return;
+
+    setIsAnalyzing(true);
+    setPreviewError(null);
+    setPreview(null);
+    setServerError(null);
+
+    try {
+      const result = await api<PreviewResponse>(
+        `/videos/preview?url=${encodeURIComponent(youtubeUrl)}`,
+      );
+      const metadata = result.data.video;
+      const currentTitle = getValues('title').trim();
+      const currentDescription = getValues('description')?.trim() ?? '';
+
+      if (!currentTitle || currentTitle === lastAutoTitle.current) {
+        setValue('title', metadata.title, { shouldValidate: true });
+        lastAutoTitle.current = metadata.title;
+      }
+      if (!currentDescription || currentDescription === lastAutoDescription.current) {
+        setValue('description', metadata.description ?? '', { shouldValidate: true });
+        lastAutoDescription.current = metadata.description;
+      }
+      setValue('thumbnailUrl', metadata.thumbnailUrl, { shouldValidate: true });
+      lastAnalyzedUrl.current = youtubeUrl;
+      setPreview(metadata);
+    } catch (error) {
+      lastAnalyzedUrl.current = null;
+      const message =
+        typeof error === 'object' &&
+        error !== null &&
+        'message' in error &&
+        typeof error.message === 'string'
+          ? error.message
+          : error instanceof Error
+            ? error.message
+            : 'Could not analyze this YouTube video.';
+      setPreviewError(message);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const onSubmit = async (
     data: FormData,
@@ -74,7 +163,10 @@ export default function NewVideoPage() {
 
       await api('/videos', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          thumbnailUrl: data.thumbnailUrl || undefined,
+        }),
       });
       router.push('/admin');
       router.refresh();
@@ -143,11 +235,29 @@ export default function NewVideoPage() {
             YouTube URL
           </label>
 
-          <input
-            {...register('youtubeUrl')}
-            placeholder="https://www.youtube.com/watch?v=..."
-            className="mt-2 w-full rounded-2xl border border-black/10 px-4 py-3 outline-none transition focus:border-black"
-          />
+          <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+            <input
+              {...register('youtubeUrl')}
+              onBlur={() => void analyzeUrl()}
+              onPaste={() => {
+                window.setTimeout(() => void analyzeUrl(), 0);
+              }}
+              placeholder="Paste a YouTube video URL"
+              className="w-full rounded-2xl border border-black/10 px-4 py-3 outline-none transition focus:border-black"
+              aria-describedby="youtube-url-help"
+            />
+            <button
+              type="button"
+              onClick={() => void analyzeUrl()}
+              disabled={isAnalyzing}
+              className="shrink-0 rounded-full border border-black/10 px-5 py-3 text-sm font-semibold transition hover:bg-black/[0.04] disabled:opacity-50"
+            >
+              {isAnalyzing ? 'Analyzing...' : 'Analyze video'}
+            </button>
+          </div>
+          <p id="youtube-url-help" className="mt-2 text-xs text-black/45">
+            Paste a public YouTube video link. We&apos;ll fill in its title, description, and thumbnail.
+          </p>
 
           {errors.youtubeUrl && (
             <p className="mt-2 text-sm text-red-600">
@@ -155,6 +265,39 @@ export default function NewVideoPage() {
             </p>
           )}
         </div>
+
+        {preview && (
+          <section aria-live="polite" className="overflow-hidden rounded-2xl border border-green-200 bg-green-50">
+            <div className="grid sm:grid-cols-[220px_1fr]">
+              <img
+                src={preview.thumbnailUrl}
+                alt={`Thumbnail for ${preview.title}`}
+                className="aspect-video h-full w-full object-cover"
+              />
+              <div className="p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-green-800">
+                  YouTube video recognized
+                </p>
+                <h2 className="mt-2 font-semibold">{preview.title}</h2>
+                <p className="mt-1 text-sm text-black/55">
+                  {preview.channelTitle ?? 'Unknown channel'}
+                  {preview.durationSeconds !== null && ` · ${formatDuration(preview.durationSeconds)}`}
+                </p>
+                <p className="mt-2 text-sm text-black/55">
+                  {preview.sourcePublishedAt
+                    ? `Published on YouTube ${new Date(preview.sourcePublishedAt).toLocaleDateString()}`
+                    : 'YouTube publish date and duration require a YouTube Data API key.'}
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {previewError && (
+          <div role="alert" className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">
+            Could not fetch YouTube metadata: {previewError}
+          </div>
+        )}
 
         <div>
           <label className="text-sm font-medium">
@@ -226,6 +369,23 @@ export default function NewVideoPage() {
             placeholder="Describe the video..."
             className="mt-2 w-full resize-none rounded-2xl border border-black/10 px-4 py-3 outline-none transition focus:border-black"
           />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium">
+            Thumbnail URL
+          </label>
+          <input
+            {...register('thumbnailUrl')}
+            type="url"
+            placeholder="Automatically filled from YouTube"
+            className="mt-2 w-full rounded-2xl border border-black/10 px-4 py-3 outline-none transition focus:border-black"
+          />
+          {errors.thumbnailUrl && (
+            <p className="mt-2 text-sm text-red-600">
+              {errors.thumbnailUrl.message}
+            </p>
+          )}
         </div>
 
         <div>

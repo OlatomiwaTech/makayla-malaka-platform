@@ -81,11 +81,21 @@ export default function VideoDetailPage({
         <div className="mt-8 max-w-4xl">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-black/35">
             {video.category}
+            {video.channelTitle ? ` · ${video.channelTitle}` : ''}
+            {video.durationSeconds !== null
+              ? ` · ${Math.floor(video.durationSeconds / 60)}:${String(video.durationSeconds % 60).padStart(2, '0')}`
+              : ''}
           </p>
 
           <h1 className="mt-3 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
             {video.title}
           </h1>
+
+          {video.sourcePublishedAt && (
+            <p className="mt-3 text-sm text-black/45">
+              Published on YouTube {new Date(video.sourcePublishedAt).toLocaleDateString()}
+            </p>
+          )}
 
           {video.description && (
             <p className="mt-5 text-base leading-7 text-black/55">

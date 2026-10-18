@@ -30,6 +30,14 @@ export function VideoCard({
           </div>
         )}
 
+        {video.durationSeconds !== null && (
+          <div className="absolute right-4 top-4 rounded bg-black/75 px-2 py-1 text-[11px] font-semibold text-white">
+            {Math.floor(video.durationSeconds / 3600) > 0
+              ? `${Math.floor(video.durationSeconds / 3600)}:${String(Math.floor((video.durationSeconds % 3600) / 60)).padStart(2, '0')}:${String(video.durationSeconds % 60).padStart(2, '0')}`
+              : `${Math.floor(video.durationSeconds / 60)}:${String(video.durationSeconds % 60).padStart(2, '0')}`}
+          </div>
+        )}
+
         <div className="absolute bottom-4 left-4 rounded-full bg-black/70 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur">
           {video.category}
         </div>
@@ -44,6 +52,11 @@ export function VideoCard({
           <p className="mt-1 line-clamp-2 text-sm leading-5 text-black/45">
             {video.description ?? 'Watch now.'}
           </p>
+          {video.sourcePublishedAt && (
+            <p className="mt-2 text-xs text-black/40">
+              Published {new Date(video.sourcePublishedAt).toLocaleDateString()}
+            </p>
+          )}
         </div>
 
         <ArrowUpRight
