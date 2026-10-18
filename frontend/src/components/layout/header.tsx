@@ -12,11 +12,11 @@ const links = [
 
 export function Header() {
 	return (
-		<header className="sticky top-0 z-50 border-b border-black/[0.06] bg-[#f7f5f1]/90 backdrop-blur-xl">
+		<header className="sticky top-0 z-50 border-b border-[#8b4a35]/10 bg-[#fffaf3]/90 backdrop-blur-xl">
 			<div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 lg:px-8">
 				<Link
 					href="/"
-					className="flex items-center gap-3 text-[20px] font-semibold tracking-[-0.04em]"
+					className="flex items-center gap-3 text-[20px] font-semibold tracking-[-0.04em] text-[#542c28]"
 				>
 					<Image
 						src="/Logo.png"

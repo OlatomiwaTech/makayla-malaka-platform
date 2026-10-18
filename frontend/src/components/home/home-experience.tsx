@@ -12,6 +12,14 @@ import { useVideos } from '@/hooks/use-videos';
 
 const socialLinks = [
   {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/makaylasuperstar/?hl=en',
+  },
+  {
+    label: 'Facebook',
+    href: 'https://www.facebook.com/makaylasuperstar/',
+  },
+  {
     label: 'YouTube',
     href: 'https://www.youtube.com/@MakaylaSuperstar',
   },
@@ -47,16 +55,22 @@ export function HomeExperience() {
   const videos = videosQuery.data?.data.videos.slice(0, 3) ?? [];
 
   return (
-    <div className="bg-[#f7f5f1]">
+    <div className="bg-[#fffaf3]">
       <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <Hero latestVideoHref={videos[0] ? `/videos/${videos[0].id}` : undefined} />
+
+        <section aria-label="Makayla at a glance" className="mt-5 grid grid-cols-3 divide-x divide-[#8b4a35]/15 rounded-2xl border border-[#8b4a35]/10 bg-white/70 px-2 py-5 shadow-sm sm:mt-7 sm:px-8 sm:py-6">
+          <div className="px-2 text-center sm:px-4"><p className="font-serif text-2xl text-[#8d344b] sm:text-3xl">6</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[0.13em] text-[#654b44]/65 sm:text-[10px] sm:tracking-[0.18em]">Albums</p></div>
+          <div className="px-2 text-center sm:px-4"><p className="font-serif text-2xl text-[#8d344b] sm:text-3xl">7</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[0.13em] text-[#654b44]/65 sm:text-[10px] sm:tracking-[0.18em]">First single at</p></div>
+          <div className="px-2 text-center sm:px-4"><p className="font-serif text-2xl text-[#8d344b] sm:text-3xl">∞</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[0.13em] text-[#654b44]/65 sm:text-[10px] sm:tracking-[0.18em]">Big dreams</p></div>
+        </section>
 
         <section id="latest-updates" className="scroll-mt-28 pt-16 sm:pt-20">
           <SectionHeader eyebrow="The latest" title="Notes from Makayla" />
           {postsQuery.isPending && (
             <div className="grid gap-5 md:grid-cols-3" aria-label="Loading updates">
               {[0, 1, 2].map((item) => (
-                <div key={item} className="h-64 animate-pulse bg-white" />
+              <div key={item} className="h-64 animate-pulse rounded-3xl bg-[#f4e9dc]" />
               ))}
             </div>
           )}
@@ -72,11 +86,11 @@ export function HomeExperience() {
           {!postsQuery.isPending && !postsQuery.isError && posts.length > 0 && (
             <div className="grid gap-x-5 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
               {posts.map((post) => (
-                <article key={post.id} className="group flex h-full flex-col border-b border-black/10 pb-6">
+                <article key={post.id} className="group flex h-full flex-col rounded-3xl border border-[#8b4a35]/10 bg-white p-3 shadow-[0_12px_40px_-32px_rgba(84,44,40,0.5)] transition hover:-translate-y-1">
                   <Link
                     href={`/posts/${post.id}`}
                     aria-label={`Read ${post.title || 'Makayla’s latest update'}`}
-                    className="relative mb-5 grid aspect-[4/3] place-items-center overflow-hidden bg-[#ece8e2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ed1689]"
+                    className="relative mb-4 grid aspect-[4/3] place-items-center overflow-hidden rounded-2xl bg-[#f4e9dc] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ed1689]"
                   >
                     {post.imageUrl ? (
                       <Image
@@ -91,7 +105,7 @@ export function HomeExperience() {
                       <Newspaper size={32} strokeWidth={1.2} className="text-[#ed1689]" aria-hidden="true" />
                     )}
                   </Link>
-                  <div className="flex flex-1 flex-col">
+                  <div className="flex flex-1 flex-col px-2 pb-2">
                     <time dateTime={post.publishedAt ?? post.createdAt} className="text-xs font-medium uppercase tracking-[0.14em] text-black/45">
                       {dateLabel(post.publishedAt ?? post.createdAt)}
                     </time>
@@ -113,7 +127,7 @@ export function HomeExperience() {
 
         <section className="pt-16 sm:pt-20">
           <SectionHeader eyebrow="Listen" title="Music by Makayla" href="/music" />
-          {musicQuery.isPending && <div className="h-64 animate-pulse bg-white" aria-label="Loading music" />}
+          {musicQuery.isPending && <div className="h-64 animate-pulse rounded-3xl bg-[#f4e9dc]" aria-label="Loading music" />}
           {musicQuery.isError && <SectionError>The music catalogue is temporarily unavailable. Please try again soon.</SectionError>}
           {!musicQuery.isPending && !musicQuery.isError && !featuredRelease && (
             <div className="flex flex-col items-start gap-4 border-y border-black/10 py-9 sm:flex-row sm:items-center sm:justify-between">
@@ -127,8 +141,8 @@ export function HomeExperience() {
             </div>
           )}
           {!musicQuery.isPending && !musicQuery.isError && featuredRelease && (
-            <div className="grid overflow-hidden bg-[#171717] text-white md:grid-cols-[minmax(240px,0.8fr)_1.2fr]">
-              <Link href={`/music/${featuredRelease.id}`} className="relative block aspect-square bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#ed1689]">
+            <div className="grid overflow-hidden rounded-3xl bg-[#633644] text-white shadow-[0_24px_70px_-40px_rgba(84,44,40,0.65)] md:grid-cols-[minmax(240px,0.8fr)_1.2fr]">
+              <Link href={`/music/${featuredRelease.id}`} className="relative block aspect-square bg-[#e9c1a6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#ed1689]">
                 {featuredRelease.coverUrl ? (
                   <Image
                     src={featuredRelease.coverUrl}
@@ -146,11 +160,11 @@ export function HomeExperience() {
               </Link>
               <div className="flex flex-col justify-between p-6 sm:p-9 lg:p-12">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff71bb]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ffd18a]">
                     {featuredRelease.isFeatured ? 'Featured release' : 'Latest release'} · {featuredRelease.type}
                   </p>
                   <h3 className="mt-4 text-3xl font-semibold tracking-[-0.045em] sm:text-4xl">
-                    <Link href={`/music/${featuredRelease.id}`} className="hover:text-[#ff71bb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff71bb]">
+                    <Link href={`/music/${featuredRelease.id}`} className="font-serif hover:text-[#ffd18a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ffd18a]">
                       {featuredRelease.title}
                     </Link>
                   </h3>
@@ -177,7 +191,7 @@ export function HomeExperience() {
           <SectionHeader eyebrow="Watch" title="Latest videos" href="/videos" />
           {videosQuery.isPending && (
             <div className="grid gap-6 md:grid-cols-3" aria-label="Loading videos">
-              {[0, 1, 2].map((item) => <div key={item} className="aspect-video animate-pulse bg-white" />)}
+            {[0, 1, 2].map((item) => <div key={item} className="aspect-video animate-pulse rounded-2xl bg-[#f4e9dc]" />)}
             </div>
           )}
           {videosQuery.isError && <SectionError>Videos are temporarily unavailable. Please try again soon.</SectionError>}
@@ -191,7 +205,7 @@ export function HomeExperience() {
             <div className="grid gap-x-5 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
               {videos.map((video) => (
                 <Link key={video.id} href={`/videos/${video.id}`} className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ed1689]">
-                  <div className="relative aspect-video overflow-hidden bg-black">
+                  <div className="relative aspect-video overflow-hidden rounded-2xl bg-[#633644]">
                     {video.thumbnailUrl ? (
                       <Image
                         src={video.thumbnailUrl}
@@ -214,11 +228,11 @@ export function HomeExperience() {
           )}
         </section>
 
-        <section className="mt-16 border-t border-black/10 py-9 sm:mt-20 sm:py-12">
+        <section className="mt-16 rounded-3xl bg-[#f3dfce] px-6 py-8 sm:mt-20 sm:px-10 sm:py-10">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c30c6c]">Stay connected</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.035em]">Follow Makayla&apos;s official channels.</h2>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8d344b]">Stay connected</p>
+              <h2 className="mt-2 font-serif text-2xl font-medium tracking-[-0.035em] text-[#542c28] sm:text-3xl">Come be part of the fun.</h2>
             </div>
             <div className="flex flex-wrap gap-3">
               {socialLinks.map((link) => (
