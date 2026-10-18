@@ -31,7 +31,17 @@ const requestJson = async (url, apiKey) => {
         throw new Error('YouTube metadata service is unreachable');
     }
     if (!response.ok) {
-        throw new Error(`YouTube metadata request failed (${response.status})`);
+        let detail = '';
+        try {
+            const body = (await response.json());
+            const reason = body.error?.errors?.[0]?.reason;
+            const message = body.error?.message?.trim();
+            detail = [reason, message].filter(Boolean).join(': ');
+        }
+        catch {
+            // Keep the HTTP status when the provider does not return JSON.
+        }
+        throw new Error(`YouTube metadata request failed (${response.status})${detail ? `: ${detail}` : ''}`);
     }
     try {
         return (await response.json());

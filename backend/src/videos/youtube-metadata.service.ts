@@ -66,7 +66,25 @@ const requestJson = async <T>(url: URL, apiKey: string): Promise<T> => {
   }
 
   if (!response.ok) {
-    throw new Error(`YouTube metadata request failed (${response.status})`);
+    let detail = '';
+
+    try {
+      const body = (await response.json()) as {
+        error?: {
+          message?: string;
+          errors?: Array<{ reason?: string }>;
+        };
+      };
+      const reason = body.error?.errors?.[0]?.reason;
+      const message = body.error?.message?.trim();
+      detail = [reason, message].filter(Boolean).join(': ');
+    } catch {
+      // Keep the HTTP status when the provider does not return JSON.
+    }
+
+    throw new Error(
+      `YouTube metadata request failed (${response.status})${detail ? `: ${detail}` : ''}`,
+    );
   }
 
   try {
