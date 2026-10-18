@@ -65,6 +65,25 @@ export function HomeExperience() {
           <div className="px-2 text-center sm:px-4"><p className="font-serif text-2xl text-[#8d344b] sm:text-3xl">∞</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[0.13em] text-[#654b44]/65 sm:text-[10px] sm:tracking-[0.18em]">Big dreams</p></div>
         </section>
 
+        <section aria-label="Makayla performing live" className="relative mt-8 isolate flex min-h-[300px] items-end overflow-hidden rounded-3xl bg-[#321c32] shadow-[0_24px_70px_-40px_rgba(84,44,40,0.6)] sm:mt-10 sm:min-h-[370px]">
+          <Image
+            src="/makayla-performance.jpeg"
+            alt="Makayla performing onstage for a crowd"
+            fill
+            sizes="(max-width: 768px) 100vw, 90vw"
+            className="-z-20 object-cover object-[center_42%]"
+          />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#241323]/95 via-[#241323]/65 to-[#241323]/10" />
+          <div className="max-w-xl px-6 py-8 text-white sm:px-10 sm:py-10">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#f8d16e]">Feel the moment</p>
+            <h2 className="mt-3 font-serif text-3xl leading-tight tracking-[-0.03em] sm:text-4xl">Good music brings us together.</h2>
+            <p className="mt-3 max-w-md text-sm leading-6 text-white/75">Step into the crowd, catch the energy, and enjoy Makayla doing what she loves.</p>
+            <Link href="/videos" className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#fff3e4] px-5 py-3 text-sm font-semibold text-[#542c28] transition hover:bg-[#f8d16e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
+              Explore videos <ArrowUpRight size={15} />
+            </Link>
+          </div>
+        </section>
+
         <section id="latest-updates" className="scroll-mt-28 pt-16 sm:pt-20">
           <SectionHeader eyebrow="The latest" title="Notes from Makayla" />
           {postsQuery.isPending && (
