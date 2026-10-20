@@ -27,6 +27,8 @@ const envSchema = z.object({
         .string()
         .trim()
         .default('@MakaylaSuperstar'),
+    RESEND_API_KEY: z.string().trim().min(1).optional(),
+    RESEND_FROM_EMAIL: z.string().trim().min(1).optional(),
 });
 const parsedEnv = envSchema.safeParse(process.env);
 if (!parsedEnv.success) {

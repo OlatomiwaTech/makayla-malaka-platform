@@ -24,4 +24,12 @@ export const loginSchema = z.object({
 export const bootstrapAdminSchema = registerSchema.extend({
     setupKey: z.string().min(1, 'Setup key is required.'),
 });
+export const passwordResetRequestSchema = z.object({
+    email: z.email('Please enter a valid email address.').trim().toLowerCase(),
+});
+export const passwordResetVerifySchema = z.object({
+    email: z.email('Please enter a valid email address.').trim().toLowerCase(),
+    code: z.string().regex(/^\d{6}$/, 'Enter the six-digit code from your email.'),
+    password: z.string().min(12, 'Use at least 12 characters.').max(128),
+});
 //# sourceMappingURL=auth.schema.js.map

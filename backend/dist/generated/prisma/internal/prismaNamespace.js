@@ -83,7 +83,8 @@ export const ModelName = {
     Notification: 'Notification',
     FanSubmission: 'FanSubmission',
     ModerationReport: 'ModerationReport',
-    RefreshToken: 'RefreshToken'
+    RefreshToken: 'RefreshToken',
+    PasswordResetOtp: 'PasswordResetOtp'
 };
 /**
  * Enums
@@ -256,6 +257,14 @@ export const RefreshTokenScalarFieldEnum = {
     tokenHash: 'tokenHash',
     expiresAt: 'expiresAt',
     revokedAt: 'revokedAt',
+    createdAt: 'createdAt'
+};
+export const PasswordResetOtpScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    codeHash: 'codeHash',
+    attempts: 'attempts',
+    expiresAt: 'expiresAt',
     createdAt: 'createdAt'
 };
 export const SortOrder = {

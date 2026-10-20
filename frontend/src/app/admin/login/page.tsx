@@ -35,7 +35,7 @@ export default function AdminLoginPage() {
   const {
     register,
     handleSubmit,
-    watch,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -168,7 +168,7 @@ export default function AdminLoginPage() {
           <button
             type="button"
             onClick={() => {
-              setRecoveryEmail(watch('email') || '');
+              setRecoveryEmail(getValues('email') || '');
               setRecoveryError(null);
               setRecoveryNotice(null);
               setRecoveryStep('request');
