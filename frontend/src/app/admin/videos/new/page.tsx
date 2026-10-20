@@ -320,7 +320,9 @@ export default function NewVideoPage() {
 
         {previewError && (
           <div role="alert" className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">
-            Could not fetch YouTube metadata: {previewError}
+            {previewError === 'This video is not from Makayla’s official YouTube channel'
+              ? previewError
+              : `Could not fetch YouTube metadata: ${previewError}`}
           </div>
         )}
 
