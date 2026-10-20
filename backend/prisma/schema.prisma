@@ -99,6 +99,7 @@ model User {
   submissions    FanSubmission[]
   reports        ModerationReport[]
   refreshTokens  RefreshToken[]
+  passwordResetOtp PasswordResetOtp?
 }
 
 model Profile {
@@ -360,5 +361,18 @@ model RefreshToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetOtp {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  codeHash  String
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([expiresAt])
 }
