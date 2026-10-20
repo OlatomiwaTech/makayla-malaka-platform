@@ -97,6 +97,24 @@ const errorHandler: ErrorRequestHandler = (
     return;
   }
 
+  if (err instanceof Error && err.message === 'Invalid or expired password reset code') {
+    res.status(400).json({ success: false, message: err.message });
+    return;
+  }
+
+  if (
+    err instanceof Error &&
+    ['Password reset email is not configured', 'Password reset email could not be sent'].includes(err.message)
+  ) {
+    res.status(503).json({
+      success: false,
+      message: err.message === 'Password reset email is not configured'
+        ? 'Password reset email is not configured. Set RESEND_API_KEY and RESEND_FROM_EMAIL in backend/.env, then restart the backend.'
+        : 'Password reset email could not be sent. Check the email provider configuration and try again.',
+    });
+    return;
+  }
+
   if (
     err instanceof Error &&
     [

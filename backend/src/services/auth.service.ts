@@ -1,7 +1,10 @@
+import crypto from 'node:crypto';
 import { prisma } from '../lib/prisma.js';
 import { comparePassword, hashPassword, signToken } from '../lib/auth.js';
 import { env } from '../config/env.js';
 import type { BootstrapAdminSchema } from '../schemas/auth.schema.js';
+import type { passwordResetRequestSchema, passwordResetVerifySchema } from '../schemas/auth.schema.js';
+import type { z } from 'zod';
 import type { AuthResponse, AuthUser, LoginInput, RegisterInput } from '../types/auth.js';
 
 const toAuthUser = (user: {
@@ -179,4 +182,103 @@ export const loginUser = async (input: LoginInput): Promise<AuthResponse> => {
     user: toAuthUser(user),
     token,
   };
+};
+
+type PasswordResetRequest = z.infer<typeof passwordResetRequestSchema>;
+type PasswordResetVerify = z.infer<typeof passwordResetVerifySchema>;
+
+const passwordResetOtpLifetimeMs = 10 * 60 * 1000;
+const passwordResetResendCooldownMs = 60 * 1000;
+const passwordResetMaxAttempts = 5;
+const eligiblePasswordResetRoles = ['MEDIA_EDITOR', 'EDITOR', 'ADMIN'] as const;
+
+const passwordResetCodeHash = (userId: string, code: string) =>
+  crypto.createHmac('sha256', env.JWT_SECRET).update(`${userId}:${code}`).digest('hex');
+
+const sendPasswordResetEmail = async (email: string, code: string) => {
+  if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL) {
+    throw new Error('Password reset email is not configured');
+  }
+
+  let response: Response;
+  try {
+    response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      signal: AbortSignal.timeout(8_000),
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: env.RESEND_FROM_EMAIL,
+        to: [email],
+        subject: 'Your Makayla Malaka admin password reset code',
+        text: `Your password reset code is ${code}. It expires in 10 minutes. If you did not request a password reset, you can ignore this email.`,
+        html: `<p>Your password reset code is:</p><p style="font-size:28px;font-weight:700;letter-spacing:6px">${code}</p><p>This code expires in 10 minutes. If you did not request a password reset, you can ignore this email.</p>`,
+      }),
+    });
+  } catch {
+    throw new Error('Password reset email could not be sent');
+  }
+
+  if (!response.ok) throw new Error('Password reset email could not be sent');
+};
+
+export const requestAdminPasswordReset = async (input: PasswordResetRequest) => {
+  if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL) {
+    throw new Error('Password reset email is not configured');
+  }
+
+  const user = await prisma.user.findFirst({
+    where: { email: input.email, role: { in: [...eligiblePasswordResetRoles] }, status: 'ACTIVE' },
+    select: { id: true, email: true },
+  });
+  if (!user) return;
+
+  const existing = await prisma.passwordResetOtp.findUnique({ where: { userId: user.id } });
+  if (existing && Date.now() - existing.createdAt.getTime() < passwordResetResendCooldownMs) return;
+
+  const code = crypto.randomInt(0, 1_000_000).toString().padStart(6, '0');
+  const expiresAt = new Date(Date.now() + passwordResetOtpLifetimeMs);
+  const codeHash = passwordResetCodeHash(user.id, code);
+  await prisma.passwordResetOtp.upsert({
+    where: { userId: user.id },
+    create: { userId: user.id, codeHash, expiresAt },
+    update: { codeHash, expiresAt, attempts: 0, createdAt: new Date() },
+  });
+
+  try {
+    await sendPasswordResetEmail(user.email, code);
+  } catch (error) {
+    await prisma.passwordResetOtp.deleteMany({ where: { userId: user.id, codeHash } });
+    throw error;
+  }
+};
+
+export const completeAdminPasswordReset = async (input: PasswordResetVerify) => {
+  const user = await prisma.user.findFirst({
+    where: { email: input.email, role: { in: [...eligiblePasswordResetRoles] }, status: 'ACTIVE' },
+    select: { id: true },
+  });
+  if (!user) throw new Error('Invalid or expired password reset code');
+
+  const reset = await prisma.passwordResetOtp.findUnique({ where: { userId: user.id } });
+  if (!reset || reset.expiresAt <= new Date() || reset.attempts >= passwordResetMaxAttempts) {
+    throw new Error('Invalid or expired password reset code');
+  }
+
+  const expectedHash = Buffer.from(reset.codeHash, 'hex');
+  const submittedHash = Buffer.from(passwordResetCodeHash(user.id, input.code), 'hex');
+  const valid = expectedHash.length === submittedHash.length && crypto.timingSafeEqual(expectedHash, submittedHash);
+  if (!valid) {
+    await prisma.passwordResetOtp.update({ where: { userId: user.id }, data: { attempts: { increment: 1 } } });
+    throw new Error('Invalid or expired password reset code');
+  }
+
+  const passwordHash = await hashPassword(input.password);
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: user.id }, data: { passwordHash } }),
+    prisma.passwordResetOtp.delete({ where: { userId: user.id } }),
+    prisma.refreshToken.deleteMany({ where: { userId: user.id } }),
+  ]);
 };
