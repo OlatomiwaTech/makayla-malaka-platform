@@ -2,18 +2,23 @@ import { z } from 'zod';
 
 const optionalUrl = z.union([z.string().trim().url(), z.literal('')]).optional();
 
+const optionalEndDate = z.preprocess(
+	(value) => value === null || value === '' ? null : value,
+	z.union([z.coerce.date(), z.null()]).optional(),
+);
+
 const eventFields = {
 	title: z.string().trim().min(1).max(200),
 	description: z.string().trim().max(5000).optional(),
 	imageUrl: optionalUrl,
 	location: z.string().trim().max(300).optional(),
 	startsAt: z.coerce.date(),
-	endsAt: z.coerce.date().optional(),
+	endsAt: optionalEndDate,
 	registrationUrl: optionalUrl,
 	status: z.enum(['DRAFT', 'UPCOMING', 'LIVE', 'COMPLETED', 'CANCELLED']).default('DRAFT'),
 };
 
-const eventDateCheck = (value: { startsAt?: Date | undefined; endsAt?: Date | undefined }, context: z.RefinementCtx) => {
+	const eventDateCheck = (value: { startsAt?: Date | undefined; endsAt?: Date | null | undefined }, context: z.RefinementCtx) => {
 	if (value.startsAt && value.endsAt && value.endsAt < value.startsAt) {
 		context.addIssue({ code: 'custom', path: ['endsAt'], message: 'End time must be on or after the start time.' });
 	}

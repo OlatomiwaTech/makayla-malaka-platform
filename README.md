@@ -95,6 +95,8 @@ Each event can contain:
 
 Past events can remain available as an archive with future support for photos, videos, and recaps.
 
+Editors and admins can manage event details and status at `/admin/events`. Public event listings are paginated, separate upcoming and past events, and expose only non-draft, non-cancelled events. Public event detail pages include event metadata and an optional external registration link.
+
 ### Community
 
 A moderated fan experience centered around Makayla.
@@ -411,7 +413,7 @@ Features should be implemented because they solve a defined product problem, not
 
 **Current Stage:** Foundation with working features in progress
 
-The repository already contains a working foundation, including account registration and authentication, profile and post API routes, public music and video catalogues, and protected administration flows for managing music, videos, and media-editor access. The owner setup flow and music/video publication tools are also implemented. These are partial product capabilities, not a complete launch-ready platform. Features described as planned above—including event and notification management, comments, community moderation, and the broader fan experience—remain future work.
+The repository already contains a working foundation, including account registration and authentication, profile and post API routes, public music, video, and event catalogues, and protected administration flows for managing music, videos, events, and media-editor access. Event management is available to editors and admins; media editors do not have event permissions. The owner setup flow and music/video publication tools are also implemented. These are partial product capabilities, not a complete launch-ready platform. Features described as planned above—including notification management, comments, community moderation, and the broader fan experience—remain future work.
 
 ## License
 
