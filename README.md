@@ -136,9 +136,9 @@ Authenticated users can maintain a basic profile containing:
 * Activity
 * Follow relationships
 
-### Administration
+### Planned Administration Capabilities
 
-A protected administration system will allow authorized team members to manage the platform without modifying code.
+The long-term administration scope is for authorized team members to manage the platform without modifying code. Most of the capabilities below are planned and are not yet available:
 
 Administrators can manage:
 
@@ -238,11 +238,11 @@ cd backend
 npx prisma migrate deploy
 ```
 
-This creates or updates the tables in the Neon database without deleting existing data.
+This applies pending migrations; the checked-in migrations do not drop tables or columns. Back up production data before applying schema changes.
 
 ## Search engine optimization
 
-Configure `NEXT_PUBLIC_SITE_URL` in the frontend deployment environment to the canonical public origin of the deployed website, and `NEXT_PUBLIC_API_URL` to the deployed backend API base URL ending in `/api`. Set `FRONTEND_URL` in the backend deployment environment to the frontend's HTTPS origin. All three must use HTTPS in production; frontend builds and backend startup fail with clear errors if their required public URLs are missing or malformed. The site URL is used for canonical links, Open Graph URLs, JSON-LD, `robots.txt`, and `sitemap.xml`; keep it set to the same HTTPS host users should see in search results. The sitemap is generated at request time and caches catalogue API responses for one hour, so a backend outage does not break the frontend build or prevent available catalogue entries from being listed.
+In production, configure `NEXT_PUBLIC_SITE_URL` in the frontend deployment environment as the canonical HTTPS origin, `NEXT_PUBLIC_API_URL` as the deployed backend API base URL ending in `/api`, and `FRONTEND_URL` in the backend deployment environment as the frontend HTTPS origin. The backend validates that `FRONTEND_URL` is an HTTPS origin at startup. The frontend does not enforce these requirements uniformly: a missing site URL can fall back to a default or hosting-provider URL, while a missing API URL prevents catalogue-backed SEO data from loading. Set all three correctly to avoid incorrect canonical URLs or incomplete catalogue metadata. The site URL is used for canonical links, Open Graph URLs, JSON-LD, `robots.txt`, and `sitemap.xml`; keep it set to the same HTTPS host users should see in search results. The sitemap is generated at request time and caches catalogue API responses for one hour. If a catalogue request fails after its cached response expires, the sitemap still includes its static pages and any successful catalogue results, but omits entries from the failed catalogue request and logs the error.
 
 Public pages include canonical URLs, Open Graph/Twitter previews, and Schema.org structured data for the artist website, music collections/releases, and YouTube videos. The sitemap refreshes hourly and includes published catalogue items; admin pages are excluded from indexing. Release and video editors can set optional SEO title and description overrides; by default the page metadata is generated from the content. Google and Bing site-verification tokens can optionally be set as `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` in the frontend environment.
 
@@ -409,9 +409,9 @@ Features should be implemented because they solve a defined product problem, not
 
 ## Status
 
-**Current Stage:** Planning / Foundation
+**Current Stage:** Foundation with working features in progress
 
-The product specification, screen map, user flows, architecture, and MVP scope are being defined before feature implementation begins.
+The repository already contains a working foundation, including account registration and authentication, profile and post API routes, public music and video catalogues, and protected administration flows for managing music, videos, and media-editor access. The owner setup flow and music/video publication tools are also implemented. These are partial product capabilities, not a complete launch-ready platform. Features described as planned above—including event and notification management, comments, community moderation, and the broader fan experience—remain future work.
 
 ## License
 
