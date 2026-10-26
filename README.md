@@ -140,7 +140,7 @@ Authenticated users can maintain a basic profile containing:
 
 The long-term administration scope is for authorized team members to manage the platform without modifying code. Most of the capabilities below are planned and are not yet available:
 
-Administrators can manage:
+Planned administration capabilities include:
 
 * Posts
 * Music releases
@@ -248,7 +248,7 @@ Public pages include canonical URLs, Open Graph/Twitter previews, and Schema.org
 
 ### Owner and content-manager accounts
 
-Set a private random `ADMIN_SETUP_KEY` of at least 32 characters in `backend/.env` before starting the backend. Open `/admin/setup` and use that key to create the first owner account; this endpoint is disabled after an admin exists. New registrations are regular accounts by default. The owner can grant or revoke the `MEDIA_EDITOR` role at `/admin/accounts`; media editors can manage music and videos but cannot manage posts, accounts, or admin permissions.
+Before starting the backend, set `JWT_SECRET` to a private random value of at least 32 characters. Set a separate private random `ADMIN_SETUP_KEY` of at least 32 characters in `backend/.env` to enable first-time owner setup. Open `/admin/setup` and use that key to create the first owner account; this endpoint is disabled after an admin exists. New registrations are regular accounts by default. The owner can grant or revoke the `MEDIA_EDITOR` role at `/admin/accounts`; media editors can manage music and videos but cannot manage posts, accounts, or admin permissions.
 
 Video analysis verifies that each video belongs to Makayla's official YouTube channel before showing metadata or allowing a save. Configure `YOUTUBE_API_KEY` with YouTube Data API v3 enabled in `backend/.env`, then restart the backend. The public `@MakaylaSuperstar` handle resolves to its stable channel ID automatically; set `YOUTUBE_CHANNEL_ID` only if you need to override that handle. The backend must allow outbound HTTPS to `www.googleapis.com`. A link from another channel is rejected; if YouTube cannot verify a link, it is not saved. The same check runs during preview and again during save so the browser cannot bypass it.
 
