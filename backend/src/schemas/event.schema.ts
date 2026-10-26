@@ -13,7 +13,7 @@ const eventFields = {
 	status: z.enum(['DRAFT', 'UPCOMING', 'LIVE', 'COMPLETED', 'CANCELLED']).default('DRAFT'),
 };
 
-const eventDateCheck = (value: { startsAt?: Date; endsAt?: Date }, context: z.RefinementCtx) => {
+const eventDateCheck = (value: { startsAt?: Date | undefined; endsAt?: Date | undefined }, context: z.RefinementCtx) => {
 	if (value.startsAt && value.endsAt && value.endsAt < value.startsAt) {
 		context.addIssue({ code: 'custom', path: ['endsAt'], message: 'End time must be on or after the start time.' });
 	}
