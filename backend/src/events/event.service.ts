@@ -4,15 +4,18 @@ import type { CreateEventInput, ManagedEventListQuery, UpdateEventInput } from '
 
 const publicStatuses = ['UPCOMING', 'LIVE', 'COMPLETED'] as const;
 
-function nullable(value: string | undefined) {
-	return value === undefined ? undefined : value || null;
-}
-
 export const getPublicEvents = async (page: number, limit: number, period: 'upcoming' | 'past' | 'all') => {
 	const now = new Date();
 	const where: Prisma.EventWhereInput = {
-		status: period === 'past' ? 'COMPLETED' : period === 'upcoming' ? { in: ['UPCOMING', 'LIVE'] } : { in: [...publicStatuses] },
-		...(period === 'upcoming' ? { startsAt: { gte: now } } : period === 'past' ? { startsAt: { lt: now } } : {}),
+		...(period === 'upcoming' ? {
+			OR: [
+				{ status: 'LIVE' },
+				{ status: 'UPCOMING', startsAt: { gte: now } },
+			],
+		} : period === 'past' ? {
+			status: 'COMPLETED',
+			startsAt: { lt: now },
+		} : { status: { in: [...publicStatuses] } }),
 	};
 	const [events, total] = await Promise.all([
 		prisma.event.findMany({ where, orderBy: { startsAt: period === 'past' ? 'desc' : 'asc' }, skip: (page - 1) * limit, take: limit }),
@@ -50,8 +53,13 @@ export const getManagedEventById = async (id: string) => {
 };
 
 export const createEvent = (input: CreateEventInput) => prisma.event.create({ data: {
-	title: input.title, description: nullable(input.description), imageUrl: nullable(input.imageUrl), location: nullable(input.location),
-	startsAt: input.startsAt, endsAt: input.endsAt ?? null, registrationUrl: nullable(input.registrationUrl), status: input.status,
+	title: input.title,
+	...(input.description !== undefined ? { description: input.description || null } : {}),
+	...(input.imageUrl !== undefined ? { imageUrl: input.imageUrl || null } : {}),
+	...(input.location !== undefined ? { location: input.location || null } : {}),
+	startsAt: input.startsAt, endsAt: input.endsAt ?? null,
+	...(input.registrationUrl !== undefined ? { registrationUrl: input.registrationUrl || null } : {}),
+	status: input.status,
 } });
 
 export const updateEvent = async (id: string, input: UpdateEventInput) => {
@@ -62,12 +70,12 @@ export const updateEvent = async (id: string, input: UpdateEventInput) => {
 	if (endsAt && endsAt < startsAt) throw new Error('End time must be on or after the start time.');
 	return prisma.event.update({ where: { id }, data: {
 		...(input.title !== undefined ? { title: input.title } : {}),
-		...(input.description !== undefined ? { description: nullable(input.description) } : {}),
-		...(input.imageUrl !== undefined ? { imageUrl: nullable(input.imageUrl) } : {}),
-		...(input.location !== undefined ? { location: nullable(input.location) } : {}),
+		...(input.description !== undefined ? { description: input.description || null } : {}),
+		...(input.imageUrl !== undefined ? { imageUrl: input.imageUrl || null } : {}),
+		...(input.location !== undefined ? { location: input.location || null } : {}),
 		...(input.startsAt !== undefined ? { startsAt: input.startsAt } : {}),
 		...(input.endsAt !== undefined ? { endsAt: input.endsAt } : {}),
-		...(input.registrationUrl !== undefined ? { registrationUrl: nullable(input.registrationUrl) } : {}),
+		...(input.registrationUrl !== undefined ? { registrationUrl: input.registrationUrl || null } : {}),
 		...(input.status !== undefined ? { status: input.status } : {}),
 	} });
 };

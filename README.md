@@ -140,7 +140,7 @@ Authenticated users can maintain a basic profile containing:
 
 ### Planned Administration Capabilities
 
-The long-term administration scope is for authorized team members to manage the platform without modifying code. Most of the capabilities below are planned and are not yet available:
+The long-term administration scope is for authorized team members to manage the platform without modifying code. Remaining planned capabilities include:
 
 Planned administration capabilities include:
 
@@ -148,7 +148,6 @@ Planned administration capabilities include:
 * Music releases
 * Tracks
 * Videos
-* Events
 * Notifications
 * Community submissions
 * Comments

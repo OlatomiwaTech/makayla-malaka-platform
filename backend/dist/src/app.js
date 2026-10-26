@@ -11,6 +11,7 @@ import musicRoutes from './routes/music.routes.js';
 import postRoutes from './routes/post.routes.js';
 import profileRoutes from './routes/profile.routes.js';
 import videoRoutes from './routes/video.routes.js';
+import eventRoutes from './routes/event.routes.js';
 const app = express();
 app.disable('x-powered-by');
 app.use(helmet({
@@ -37,6 +38,7 @@ app.use('/api/music', musicRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/videos', videoRoutes);
+app.use('/api/events', eventRoutes);
 app.get('/health', (_req, res) => {
     res.status(200).json({
         success: true,
@@ -141,6 +143,14 @@ const errorHandler = (err, _req, res, _next) => {
             success: false,
             message: err.message,
         });
+        return;
+    }
+    if (err instanceof Error && err.message === 'Event not found') {
+        res.status(404).json({ success: false, message: err.message });
+        return;
+    }
+    if (err instanceof Error && err.message === 'End time must be on or after the start time.') {
+        res.status(400).json({ success: false, message: err.message });
         return;
     }
     if (err instanceof Error &&
