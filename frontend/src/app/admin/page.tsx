@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowUpRight, Disc3, ListMusic, UsersRound, Video } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, Disc3, ListMusic, UsersRound, Video } from 'lucide-react';
 
 export default function AdminPage() {
   return (
@@ -12,7 +12,7 @@ export default function AdminPage() {
           Content studio
         </h1>
         <p className="mt-3 max-w-xl text-sm leading-6 text-black/50">
-          Add and publish music releases and videos to the public catalogues.
+          Add and publish music releases, videos, and events to the public catalogues.
         </p>
         <Link
           href="/admin/login"
@@ -29,6 +29,17 @@ export default function AdminPage() {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
+        <Link
+          href="/admin/events"
+          className="group rounded-[28px] border border-black/[0.07] bg-white p-7 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div className="flex items-start justify-between">
+            <span className="grid size-12 place-items-center rounded-2xl bg-[#f2f0eb]"><CalendarDays size={22} /></span>
+            <ArrowUpRight className="text-black/35 transition group-hover:text-black" size={20} />
+          </div>
+          <h2 className="mt-8 text-2xl font-semibold tracking-[-0.04em]">Manage events</h2>
+          <p className="mt-2 text-sm leading-6 text-black/50">Create event announcements, update details, and manage event status.</p>
+        </Link>
         <Link
           href="/admin/music/new"
           className="group rounded-[28px] border border-black/[0.07] bg-white p-7 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"

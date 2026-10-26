@@ -1,5 +1,6 @@
 import type { MusicRelease } from '@/types/music';
 import type { Video } from '@/types/video';
+import type { Event } from '@/types/event';
 
 const apiUrl = (
   process.env.NEXT_PUBLIC_API_URL ??
@@ -31,8 +32,8 @@ const fetchSeoRecord = async <T>(path: string): Promise<T | null> => {
     });
     if (!response.ok) return null;
 
-    const body: { data?: { release?: T; video?: T } } = await response.json();
-    return body.data?.release ?? body.data?.video ?? null;
+    const body: { data?: { release?: T; video?: T; event?: T } } = await response.json();
+    return body.data?.release ?? body.data?.video ?? body.data?.event ?? null;
   } catch (error) {
     console.error(`Unable to fetch SEO metadata for ${path}:`, error);
     return null;
@@ -44,6 +45,9 @@ export const getPublicReleaseForSeo = (id: string) =>
 
 export const getPublicVideoForSeo = (id: string) =>
   fetchSeoRecord<Video>(`/videos/${encodeURIComponent(id)}`);
+
+export const getPublicEventForSeo = (id: string) =>
+  fetchSeoRecord<Event>(`/events/${encodeURIComponent(id)}`);
 
 export const jsonLd = (value: Record<string, unknown>) => ({
   __html: JSON.stringify(value).replace(/</g, '\\u003c'),
