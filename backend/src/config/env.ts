@@ -72,5 +72,7 @@ if (parsedEnv.data.NODE_ENV === 'production') {
 
 export const env = {
   ...parsedEnv.data,
-  FRONTEND_URL: parsedEnv.data.FRONTEND_URL ?? 'http://localhost:3000',
+  FRONTEND_URL: parsedEnv.data.FRONTEND_URL
+    ? new URL(parsedEnv.data.FRONTEND_URL).origin
+    : 'http://localhost:3000',
 };
