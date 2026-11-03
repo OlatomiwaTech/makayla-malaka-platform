@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowUpRight, Disc3, ExternalLink, Newspaper, Video as VideoIcon } from 'lucide-react';
 
 import { Hero } from '@/components/home/hero';
+import { EventSpotlight } from '@/components/home/event-spotlight';
 import { SectionHeader } from '@/components/home/section-header';
 import { MusicPlatformFallback } from '@/components/music/music-platform-fallback';
 import { VideoChannelFallback } from '@/components/videos/video-channel-fallback';
@@ -199,6 +200,8 @@ export function HomeExperience() {
             </div>
           )}
         </section>
+
+        <EventSpotlight />
 
         <section className="pt-16 sm:pt-20">
           <SectionHeader eyebrow="Watch" title="Latest videos" href="/videos" />

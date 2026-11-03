@@ -4,9 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, CalendarDays, MapPin } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
-import type { EventsResponse } from '@/types/event';
+import { useEvents, type EventPeriod } from '@/hooks/use-events';
 
 const channels = [
   { label: 'Instagram', href: 'https://www.instagram.com/makaylasuperstar/?hl=en' },
@@ -14,9 +12,9 @@ const channels = [
 ];
 
 export default function EventsPage() {
-  const [period, setPeriod] = useState<'upcoming' | 'past'>('upcoming');
+  const [period, setPeriod] = useState<Exclude<EventPeriod, 'all'>>('upcoming');
   const [page, setPage] = useState(1);
-  const query = useQuery({ queryKey: ['events', period, page], queryFn: () => api<EventsResponse>(`/events?period=${period}&page=${page}&limit=12`) });
+  const query = useEvents(period, page);
   const events = query.data?.data.events ?? [];
 
   return <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
