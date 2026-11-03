@@ -127,6 +127,9 @@ export const loginUser = async (input) => {
     if (!isPasswordValid) {
         throw new Error('Invalid email or password.');
     }
+    if (user.status !== 'ACTIVE') {
+        throw new Error('This account is not active');
+    }
     const token = signToken({
         sub: user.id,
         email: user.email,
