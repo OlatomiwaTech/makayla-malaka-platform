@@ -56,8 +56,9 @@ const getOfficialChannelId = async (apiKey) => {
     if (env.YOUTUBE_CHANNEL_ID)
         return env.YOUTUBE_CHANNEL_ID;
     const handle = env.YOUTUBE_CHANNEL_HANDLE;
-    if (resolvedOfficialChannel?.handle === handle) {
-        return resolvedOfficialChannel.id;
+    const resolvedChannelId = resolvedOfficialChannel?.handle === handle ? resolvedOfficialChannel.id : null;
+    if (resolvedChannelId) {
+        return resolvedChannelId;
     }
     if (!officialChannelLookup) {
         const url = new URL('https://www.googleapis.com/youtube/v3/channels');
