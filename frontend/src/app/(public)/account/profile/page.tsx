@@ -110,6 +110,9 @@ export default function AccountProfilePage() {
       </div>
 
       <section className="mt-7 rounded-3xl border border-[#8b4a35]/10 bg-white p-6 shadow-sm sm:p-8">
+        <p className="mb-6 rounded-2xl bg-[#fffaf3] p-4 text-sm leading-6 text-[#654b44]/70">
+          Your display name, bio, and avatar are visible on your public profile. Your email address stays private.
+        </p>
         <div className="mb-7 flex items-center gap-4 border-b border-[#8b4a35]/10 pb-6">
           {profile.profile?.avatarUrl ? (
             <Image src={profile.profile.avatarUrl} alt="" width={64} height={64} unoptimized className="size-16 rounded-full object-cover" />

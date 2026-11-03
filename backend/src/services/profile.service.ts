@@ -60,7 +60,6 @@ export const getPublicProfile = async (username: string) => {
   const user = await prisma.user.findUnique({
     where: { username, status: 'ACTIVE' },
     select: {
-      id: true,
       username: true,
       profile: {
         select: {

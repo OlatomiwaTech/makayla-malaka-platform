@@ -22,7 +22,6 @@ export type MyProfileResponse = {
 };
 
 export type PublicProfile = {
-  id: string;
   username: string;
   profile: Profile | null;
 };
