@@ -241,6 +241,10 @@ npx prisma migrate deploy
 
 This applies pending migrations; the checked-in migrations do not drop tables or columns. Back up production data before applying schema changes.
 
+### Render backend service
+
+Set the Render service root directory to `backend` and its build command to `npm run build:render`. This installs the locked development dependencies needed for Prisma generation and TypeScript compilation, even when `NODE_ENV=production` omits development dependencies by default. Set the start command to `npm start` and use Node.js 22.
+
 ## Search engine optimization
 
 In production, configure `NEXT_PUBLIC_SITE_URL` in the frontend deployment environment as the canonical HTTPS origin, `NEXT_PUBLIC_API_URL` as the deployed backend API base URL ending in `/api`, and `FRONTEND_URL` in the backend deployment environment as the frontend HTTPS origin. The backend validates that `FRONTEND_URL` is an HTTPS origin at startup. The frontend does not enforce these requirements uniformly: a missing site URL can fall back to a default or hosting-provider URL, while a missing API URL prevents catalogue-backed SEO data from loading. Set all three correctly to avoid incorrect canonical URLs or incomplete catalogue metadata. The site URL is used for canonical links, Open Graph URLs, JSON-LD, `robots.txt`, and `sitemap.xml`; keep it set to the same HTTPS host users should see in search results. The sitemap is generated at request time and caches catalogue API responses for one hour. If a catalogue request fails after its cached response expires, the sitemap still includes its static pages and any successful catalogue results, but omits entries from the failed catalogue request and logs the error.
