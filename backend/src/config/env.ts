@@ -7,9 +7,10 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(5000),
 
   FRONTEND_URL: z
-    .string()
-    .url()
-    .optional(),
+    .preprocess(
+      (value) => typeof value === 'string' ? value.trim() || undefined : value,
+      z.string().url().optional(),
+    ),
 
   DATABASE_URL: z
     .string()
