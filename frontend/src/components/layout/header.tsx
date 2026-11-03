@@ -67,9 +67,9 @@ export function Header() {
 						</Link>
 
 						<Link
-							href="/register"
-							aria-label="Create an account"
-							title="Create an account"
+							href="/account/profile"
+							aria-label="Fan profile"
+							title="Fan profile"
 							className="ml-1 grid size-9 place-items-center rounded-full bg-[#8d344b] text-white shadow-sm shadow-[#8d344b]/20 transition hover:bg-[#74283d]"
 						>
 							<UserRound size={16} strokeWidth={2} />

@@ -58,7 +58,7 @@ export const updateMyProfile = async (userId: string, input: UpdateProfileInput)
 
 export const getPublicProfile = async (username: string) => {
   const user = await prisma.user.findUnique({
-    where: { username: username.toLowerCase() },
+    where: { username, status: 'ACTIVE' },
     select: {
       id: true,
       username: true,

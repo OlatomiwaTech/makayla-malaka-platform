@@ -14,11 +14,13 @@ export const updateProfileSchema = z.object({
     .max(160, 'Bio must not exceed 160 characters')
     .optional(),
 
-  avatarUrl: z
-    .string()
-    .trim()
-    .url('Avatar URL must be a valid URL')
-    .optional(),
+  avatarUrl: z.preprocess(
+    (value) => value === '' ? null : value,
+    z.union([
+      z.string().trim().url('Avatar URL must be a valid URL'),
+      z.null(),
+    ]).optional(),
+  ),
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;

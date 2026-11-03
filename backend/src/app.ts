@@ -186,10 +186,13 @@ const errorHandler: ErrorRequestHandler = (
     return;
   }
 
-  if (err instanceof Error && err.message === 'Music release not found') {
+  if (
+    err instanceof Error &&
+    ['Music release not found', 'User not found', 'Profile not found'].includes(err.message)
+  ) {
     res.status(404).json({
       success: false,
-      message: err.message,
+      message: err.message === 'User not found' ? 'Profile not found' : err.message,
     });
 
     return;

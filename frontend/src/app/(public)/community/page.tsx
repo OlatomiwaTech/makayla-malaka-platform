@@ -20,7 +20,7 @@ export default function CommunityPage() {
       <section className="rounded-[2rem] bg-[#fff3e4] px-6 py-10 shadow-sm ring-1 ring-[#8b4a35]/10 sm:px-10 sm:py-14">
         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#b64d60]">For the fans, families & dreamers</p>
         <h1 className="mt-3 max-w-3xl font-serif text-4xl tracking-[-0.045em] text-[#542c28] sm:text-6xl">There’s room for you here.</h1>
-        <p className="mt-5 max-w-2xl text-base leading-7 text-[#654b44]/75">Follow along, enjoy the music, and share the moments that make you smile. Find Makayla on her official channels below.</p>
+        <p className="mt-5 max-w-2xl text-base leading-7 text-[#654b44]/75">Follow along, enjoy the music, and share the moments that make you smile. Create a fan profile here, and find Makayla on her official channels below.</p>
       </section>
 
       <section className="mt-10" aria-labelledby="official-channels-heading">
@@ -43,6 +43,7 @@ export default function CommunityPage() {
           })}
         </div>
         <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/register" className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#8d344b] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#74283d]">Create a fan profile<ArrowUpRight size={15} /></Link>
           <Link href="/music" className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#8d344b] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#74283d]">Explore music<ArrowUpRight size={15} /></Link>
           <Link href="/videos" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#8b4a35]/20 px-5 py-3 text-sm font-semibold text-[#542c28] transition hover:bg-[#fff3e4]">Watch videos<ArrowUpRight size={15} /></Link>
         </div>

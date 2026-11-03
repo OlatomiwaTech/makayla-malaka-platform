@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { api } from '@/lib/api';
+import { api, authTokenStore } from '@/lib/api';
 
 const formSchema = z.object({
   displayName: z.string().trim().min(2, 'Enter your name').max(50),
@@ -17,7 +18,12 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+type RegisterResponse = {
+  token: string;
+};
+
 export default function RegisterPage() {
+  const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
   const {
@@ -31,11 +37,14 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormData) => {
     setServerError(null);
     try {
-      await api('/auth/register', {
+      const result = await api<RegisterResponse>('/auth/register', {
         method: 'POST',
         body: JSON.stringify(data),
       });
+      authTokenStore.set(result.token);
       setCreated(true);
+      router.push('/account/profile');
+      router.refresh();
     } catch (error) {
       const message =
         typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string'
@@ -63,10 +72,10 @@ export default function RegisterPage() {
         <div role="status" className="rounded-[28px] bg-white p-7 shadow-sm">
           <h2 className="text-xl font-semibold">Account created</h2>
           <p className="mt-2 text-sm leading-6 text-black/55">
-            Your account has regular access. Ask the owner to grant you content access if you need to add songs or videos.
+            Your account is ready. Complete your fan profile to introduce yourself to the community.
           </p>
-          <Link href="/admin/login" className="mt-5 inline-block rounded-full bg-black px-5 py-3 text-sm font-semibold text-white">
-            Continue to sign in
+          <Link href="/account/profile" className="mt-5 inline-block rounded-full bg-[#8d344b] px-5 py-3 text-sm font-semibold text-white">
+            Complete your profile
           </Link>
         </div>
       ) : (
@@ -104,7 +113,7 @@ export default function RegisterPage() {
         </form>
       )}
 
-      <Link href="/admin/login" className="mt-6 inline-block text-sm font-medium text-black/55 hover:text-black">
+      <Link href="/account/login" className="mt-6 inline-block text-sm font-medium text-black/55 hover:text-black">
         Already registered? Sign in
       </Link>
     </main>
