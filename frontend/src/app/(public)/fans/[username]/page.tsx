@@ -1,9 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 
 import { usePublicProfile } from '@/hooks/use-profile';
+
+const errorStatus = (error: unknown) =>
+  typeof error === 'object' && error !== null && 'status' in error && typeof error.status === 'number'
+    ? error.status
+    : null;
 
 export default function PublicFanProfilePage() {
   const { username } = useParams<{ username: string }>();
@@ -15,11 +21,15 @@ export default function PublicFanProfilePage() {
   }
 
   if (query.isError || !profile) {
+    const profileNotFound = errorStatus(query.error) === 404;
+
     return (
       <main className="mx-auto max-w-xl px-4 py-16 text-center sm:px-6">
-        <h1 className="font-serif text-3xl text-[#542c28]">Profile not found</h1>
-        <p className="mt-3 text-sm text-[#654b44]/65">This fan profile may have been removed or is no longer public.</p>
-        <Link href="/community" className="mt-6 inline-block rounded-full bg-[#8d344b] px-5 py-3 text-sm font-semibold text-white">Back to community</Link>
+        <h1 className="font-serif text-3xl text-[#542c28]">{profileNotFound ? 'Profile not found' : 'Profile unavailable'}</h1>
+        <p role={profileNotFound ? undefined : 'alert'} className="mt-3 text-sm text-[#654b44]/65">{profileNotFound ? 'This fan profile may have been removed or is no longer public.' : 'We couldn’t load this profile. Please try again.'}</p>
+        {profileNotFound
+          ? <Link href="/community" className="mt-6 inline-block rounded-full bg-[#8d344b] px-5 py-3 text-sm font-semibold text-white">Back to community</Link>
+          : <button type="button" onClick={() => void query.refetch()} className="mt-6 rounded-full bg-[#8d344b] px-5 py-3 text-sm font-semibold text-white">Try again</button>}
       </main>
     );
   }
@@ -30,8 +40,7 @@ export default function PublicFanProfilePage() {
     <main className="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-16">
       <section className="rounded-[2rem] border border-[#8b4a35]/10 bg-white p-7 text-center shadow-sm sm:p-12">
         {profile.profile?.avatarUrl ? (
-          // External avatar URLs are user-provided; Next image optimization is intentionally disabled.
-          <img src={profile.profile.avatarUrl} alt="" className="mx-auto size-24 rounded-full object-cover" />
+          <Image src={profile.profile.avatarUrl} alt="" width={96} height={96} unoptimized className="mx-auto size-24 rounded-full object-cover" />
         ) : (
           <div aria-hidden="true" className="mx-auto grid size-24 place-items-center rounded-full bg-[#f7e8d8] font-serif text-4xl text-[#8d344b]">
             {displayName.slice(0, 1).toUpperCase()}

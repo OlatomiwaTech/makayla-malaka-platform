@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -18,6 +19,11 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
+
+const errorStatus = (error: unknown) =>
+  typeof error === 'object' && error !== null && 'status' in error && typeof error.status === 'number'
+    ? error.status
+    : null;
 
 export default function AccountProfilePage() {
   const router = useRouter();
@@ -65,6 +71,20 @@ export default function AccountProfilePage() {
   }
 
   if (profileQuery.isError || !profile) {
+    const needsSignIn = errorStatus(profileQuery.error) === 401;
+
+    if (!needsSignIn) {
+      return (
+        <main className="mx-auto max-w-xl px-4 py-16 sm:px-6">
+          <section className="rounded-3xl border border-[#8b4a35]/10 bg-white p-7 text-center sm:p-10">
+            <h1 className="font-serif text-3xl text-[#542c28]">Profile unavailable</h1>
+            <p role="alert" className="mt-3 text-sm leading-6 text-[#654b44]/65">We couldn’t load your profile. Please try again.</p>
+            <button type="button" onClick={() => void profileQuery.refetch()} className="mt-6 rounded-full bg-[#8d344b] px-5 py-3 text-sm font-semibold text-white">Try again</button>
+          </section>
+        </main>
+      );
+    }
+
     return (
       <main className="mx-auto max-w-xl px-4 py-16 sm:px-6">
         <section className="rounded-3xl border border-[#8b4a35]/10 bg-white p-7 text-center sm:p-10">
@@ -92,8 +112,7 @@ export default function AccountProfilePage() {
       <section className="mt-7 rounded-3xl border border-[#8b4a35]/10 bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-7 flex items-center gap-4 border-b border-[#8b4a35]/10 pb-6">
           {profile.profile?.avatarUrl ? (
-            // External avatar URLs are user-provided; Next image optimization is intentionally disabled.
-            <img src={profile.profile.avatarUrl} alt="" className="size-16 rounded-full object-cover" />
+            <Image src={profile.profile.avatarUrl} alt="" width={64} height={64} unoptimized className="size-16 rounded-full object-cover" />
           ) : (
             <div aria-hidden="true" className="grid size-16 place-items-center rounded-full bg-[#f7e8d8] font-serif text-2xl text-[#8d344b]">
               {(profile.profile?.displayName ?? profile.username).slice(0, 1).toUpperCase()}
@@ -131,7 +150,7 @@ export default function AccountProfilePage() {
             {errors.avatarUrl && <p className="mt-2 text-sm text-red-600">{errors.avatarUrl.message}</p>}
           </div>
 
-          {updateProfile.isError && <p role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-700">Your profile could not be saved. Please try again.</p>}
+          {updateProfile.isError && <p role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-700">{updateProfile.error instanceof Error ? updateProfile.error.message : 'Your profile could not be saved. Please try again.'}</p>}
           {updateProfile.isSuccess && !isDirty && <p role="status" className="rounded-2xl bg-green-50 p-4 text-sm text-green-800">Your profile is up to date.</p>}
 
           <button type="submit" disabled={updateProfile.isPending || !isDirty} className="w-full rounded-full bg-[#8d344b] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#74283d] disabled:cursor-not-allowed disabled:opacity-50">

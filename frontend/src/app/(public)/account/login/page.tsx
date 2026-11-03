@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -22,6 +23,7 @@ type LoginResponse = {
 
 export default function AccountLoginPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
@@ -39,6 +41,7 @@ export default function AccountLoginPage() {
         body: JSON.stringify(data),
       });
 
+      queryClient.removeQueries({ queryKey: ['profile'] });
       authTokenStore.set(result.token);
       router.push('/account/profile');
       router.refresh();

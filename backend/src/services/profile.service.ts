@@ -44,7 +44,7 @@ export const updateMyProfile = async (userId: string, input: UpdateProfileInput)
     throw new Error('Profile not found');
   }
 
-  const updatedProfile = await prisma.profile.update({
+  await prisma.profile.update({
     where: { userId },
     data: {
       ...(input.displayName !== undefined ? { displayName: input.displayName } : {}),
@@ -53,7 +53,7 @@ export const updateMyProfile = async (userId: string, input: UpdateProfileInput)
     },
   });
 
-  return updatedProfile;
+  return getMyProfile(userId);
 };
 
 export const getPublicProfile = async (username: string) => {

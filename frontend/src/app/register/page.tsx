@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -24,6 +25,7 @@ type RegisterResponse = {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [serverError, setServerError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
   const {
@@ -41,6 +43,7 @@ export default function RegisterPage() {
         method: 'POST',
         body: JSON.stringify(data),
       });
+      queryClient.removeQueries({ queryKey: ['profile'] });
       authTokenStore.set(result.token);
       setCreated(true);
       router.push('/account/profile');
