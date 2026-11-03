@@ -1,7 +1,10 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, RequestHandler } from 'express';
 
-import { verifyToken } from '../lib/auth.js';
 import type { UserRole } from '../../generated/prisma/client.js';
+import { verifyToken } from '../lib/auth.js';
+import { prisma } from '../lib/prisma.js';
+import { asyncHandler } from './async-handler.js';
+import type { AuthTokenPayload } from '../types/auth.js';
 
 export type AuthenticatedRequest = Request & {
   user?: {
@@ -10,30 +13,54 @@ export type AuthenticatedRequest = Request & {
   };
 };
 
-export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+export const requireAuth: RequestHandler = asyncHandler(async (req, res, next) => {
   const authorization = req.headers.authorization;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res.status(401).json({
+    res.status(401).json({
       success: false,
       message: 'Authentication token is required.',
     });
+    return;
   }
 
+  let payload: AuthTokenPayload;
   try {
     const token = authorization.replace('Bearer ', '').trim();
-    const payload = verifyToken(token);
-
-    (req as AuthenticatedRequest).user = {
-      id: payload.sub,
-      role: payload.role,
-    };
-
-    return next();
+    payload = verifyToken(token);
   } catch {
-    return res.status(401).json({
+    res.status(401).json({
       success: false,
       message: 'Invalid or expired token.',
     });
+    return;
   }
-};
+
+  if (typeof payload.sub !== 'string' || payload.sub.length === 0) {
+    res.status(401).json({
+      success: false,
+      message: 'Invalid or expired token.',
+    });
+    return;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: payload.sub },
+    select: { id: true, role: true, status: true },
+  });
+
+  if (!user || user.status !== 'ACTIVE') {
+    res.status(401).json({
+      success: false,
+      message: 'Invalid or expired token.',
+    });
+    return;
+  }
+
+  (req as AuthenticatedRequest).user = {
+    id: user.id,
+    role: user.role,
+  };
+
+  return next();
+});
